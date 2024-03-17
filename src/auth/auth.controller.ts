@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -26,8 +27,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('/')
-  home() {
-    return 'Welcome to foodit backend api';
+  home(@Res() res) {
+    res.send('Welcome to foodit backend api');
   }
 
   /** API Endpoint for User Registration */

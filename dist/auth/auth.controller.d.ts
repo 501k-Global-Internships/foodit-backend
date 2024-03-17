@@ -5,7 +5,7 @@ import { Request } from 'express';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    home(): string;
+    home(res: any): void;
     createUser(signupDetails: SignupDto): Promise<import("../typeDef.dto").Tokens>;
     login(loginDetails: LoginDto): Promise<import("../typeDef.dto").Tokens>;
     logout(req: Request): Promise<string>;

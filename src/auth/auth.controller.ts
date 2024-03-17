@@ -25,6 +25,11 @@ import { JwtGuard } from './guards/jwt_at.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('/')
+  home() {
+    return 'Welcome to foodit backend api';
+  }
+
   /** API Endpoint for User Registration */
   @ApiBadRequestResponse()
   @Post('local/signup')

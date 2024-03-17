@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { EmailModule } from './email/email.module';
+import { VendorModule } from './vendor/vendor.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EmailModule } from './email/email.module';
     AuthModule,
     AdminModule,
     EmailModule,
+    VendorModule,
   ],
 })
 export class AppModule {}

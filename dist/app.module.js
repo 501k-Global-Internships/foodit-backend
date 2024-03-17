@@ -16,6 +16,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./user/entities/user.entity");
 const email_module_1 = require("./email/email.module");
 const vendor_module_1 = require("./vendor/vendor.module");
+const app_controller_1 = require("./app.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,6 +49,7 @@ exports.AppModule = AppModule = __decorate([
             email_module_1.EmailModule,
             vendor_module_1.VendorModule,
         ],
+        controllers: [app_controller_1.AppController],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

@@ -25,9 +25,6 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    home(res) {
-        res.send('Welcome to foodit backend api');
-    }
     createUser(signupDetails) {
         return this.authService.createUser(signupDetails);
     }
@@ -44,14 +41,6 @@ let AuthController = class AuthController {
     }
 };
 exports.AuthController = AuthController;
-__decorate([
-    (0, common_1.Get)('/'),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "home", null);
 __decorate([
     openapi.ApiOperation({ description: "API Endpoint for User Registration" }),
     (0, swagger_1.ApiBadRequestResponse)(),

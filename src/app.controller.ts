@@ -1,11 +1,11 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
-@Controller()
+@Controller('')
 export class AppController {
   constructor() {}
 
-  @Get('/')
-  home(@Res() res) {
-    res.send('Welcome to foodit backend api');
+  @Get()
+  getHello(): string {
+    return 'Welcome to FoodIt';
   }
 }

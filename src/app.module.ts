@@ -8,6 +8,7 @@ import { User } from './user/entities/user.entity';
 import { EmailModule } from './email/email.module';
 import { VendorModule } from './vendor/vendor.module';
 import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -40,5 +41,6 @@ import { AppController } from './app.controller';
     VendorModule,
   ],
   controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

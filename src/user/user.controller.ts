@@ -32,7 +32,7 @@ export class UserController {
   /** API Endpoint for updating user information. */
   @Patch()
   updateUser(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.updateUser(req.user.id, updateUserDto);
+    return this.userService.updateUser(req.user['id'], updateUserDto);
   }
 
   /**
@@ -42,6 +42,6 @@ export class UserController {
   @ApiOperation({ description: 'API Endpoint for deactivating user data' })
   @Delete('deactivate')
   deactivateUser(@Req() req: Request) {
-    return this.userService.deactivateUser(req.user.id);
+    return this.userService.deactivateUser(req.user['id']);
   }
 }

@@ -46,6 +46,8 @@ User Registration Method
       const refreshToken = await this.generateRefreshToken(payload);
       // Send Welcome Email
       this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
+      console.log ( accessToken )
+      
       // Return Tokens
       return { accessToken, refreshToken };
     } catch (error: any) {

@@ -7,9 +7,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt_at.strategy';
 import { RtStrategy } from './strategies/jwt_rf.strategy';
+import { VendorModule } from 'src/vendor/vendor.module';
 
 @Module({
   imports: [
+    VendorModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],

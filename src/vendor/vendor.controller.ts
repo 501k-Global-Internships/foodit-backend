@@ -35,16 +35,11 @@ export class VendorController {
     return req.user;
   }
 
-   @Get('logout')
-   @UseGuards(JwtGuard)
-   async logout(@Req() req: Request) {
-     await this.vendorService.logout(req.user.id);
-     return 'You have successfully logout of the system, see you soon!';
-   }
+
 
   @Patch()
   updateVendor(@Req() req: Request, @Body() updateVendorDto: UpdateVendorDto) {
-    return this.vendorService.updateVendor(req.user.id, updateVendorDto);
+    return this.vendorService.updateVendor(req.user['id'], updateVendorDto);
   }
 
   @ApiOperation({ description: 'API Endpoint for deactivating vender data' })

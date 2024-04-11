@@ -54,7 +54,8 @@ export class AuthController {
   login(@Body() loginDetails: LoginDto) {
     return this.authService.login(loginDetails);
   }
-
+  
+    /** API Endpoint to Login Vendor */
   @Post('vendor/login')
   @HttpCode(HttpStatus.OK)
   Login(@Body() loginDetails: vendorLoginDto) {
@@ -66,6 +67,14 @@ export class AuthController {
   @UseGuards(JwtGuard)
   async logout(@Req() req: Request) {
     await this.authService.logout(req.user['id']);
+    return 'You have successfully logout of the system, see you soon!';
+  }
+
+    /** API Endpoint to Logout Vendor */
+  @Get('vendor/logout')
+  @UseGuards(JwtGuard)
+  async Logout(@Req() req: Request) {
+    await this.vendorService.logout(req.user['id']);
     return 'You have successfully logout of the system, see you soon!';
   }
 

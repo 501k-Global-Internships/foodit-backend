@@ -11,25 +11,21 @@ import {
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import { vendorLoginDto } from 'src/vendor/dto/vendor-login.dto';
 import {
   ApiBadRequestResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
 import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 import { Request } from 'express';
 import { JwtGuard } from './guards/jwt_at.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { VendorService } from 'src/vendor/vendor.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly vendorService: VendorService
     ) {}
 
   /** API Endpoint for User Registration */
@@ -37,11 +33,6 @@ export class AuthController {
   @Post('local/signup')
   createUser(@Body() signupDetails: SignupDto) {
     return this.authService.createUser(signupDetails);
-  }
-
-  @Post('vendor/signup')
-  createuser(@Body() signupDetails: VendorSignupDto) {
-    return this.vendorService.createvendor(signupDetails);
   }
 
   /** API Endpoint to Login User */
@@ -54,27 +45,12 @@ export class AuthController {
   login(@Body() loginDetails: LoginDto) {
     return this.authService.login(loginDetails);
   }
-  
-    /** API Endpoint to Login Vendor */
-  @Post('vendor/login')
-  @HttpCode(HttpStatus.OK)
-  Login(@Body() loginDetails: vendorLoginDto) {
-     return this.vendorService.login(loginDetails);
-  } 
 
   /** API Endpoint to Logout User */
   @Get('logout')
   @UseGuards(JwtGuard)
   async logout(@Req() req: Request) {
     await this.authService.logout(req.user['id']);
-    return 'You have successfully logout of the system, see you soon!';
-  }
-
-    /** API Endpoint to Logout Vendor */
-  @Get('vendor/logout')
-  @UseGuards(JwtGuard)
-  async Logout(@Req() req: Request) {
-    await this.vendorService.logout(req.user['id']);
     return 'You have successfully logout of the system, see you soon!';
   }
 

@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt_at.strategy';
 import { RtStrategy } from './strategies/jwt_rf.strategy';
 import { VendorModule } from 'src/vendor/vendor.module';
+import { VendorAuth } from './vendorAuth/vendor.auth';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { VendorModule } from 'src/vendor/vendor.module';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, VendorAuth],
   providers: [AuthService, JwtStrategy, RtStrategy],
 })
 export class AuthModule {}

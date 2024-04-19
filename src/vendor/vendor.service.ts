@@ -8,7 +8,7 @@ import { vendorLoginDto } from './dto/vendor-login.dto';
 import * as bcrypt from 'bcrypt';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload, Tokens } from 'src/typeDef.dto';
+import { JwtPayload, Tokens } from 'src/utils/typeDef.dto';
 import { JwtService } from '@nestjs/jwt';
 import { hashData } from 'src/utils/utils';
 

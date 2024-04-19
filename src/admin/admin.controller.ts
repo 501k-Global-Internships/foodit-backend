@@ -3,7 +3,7 @@ import { AdminService } from './admin.service';
 import { ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt_at.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { UserRole } from 'src/typeDef.dto';
+import { UserRole } from 'src/utils/typeDef.dto';
 
 @ApiTags('Admin')
 @Controller('admin')

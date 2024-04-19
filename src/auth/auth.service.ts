@@ -12,7 +12,7 @@ import { User } from 'src/user/entities/user.entity';
 import { SignupDto } from './dto/signup.dto';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload, Tokens } from 'src/typeDef.dto';
+import { JwtPayload, Tokens } from 'src/utils/typeDef.dto';
 import { hashData } from 'src/utils/utils';
 
 @Injectable()

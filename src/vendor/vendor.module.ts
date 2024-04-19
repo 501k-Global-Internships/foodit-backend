@@ -5,8 +5,8 @@ import { VendorService } from './vendor.service';
 import { VendorController } from './vendor.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from 'src/vendor/strategy/jwt_at.strategy';
-import { RtStrategy } from 'src/auth/strategies/jwt_rf.strategy';
+import { JwtStrategy } from 'src/auth/strategies/vendor_jwt_at.strategy';
+import { RtStrategy } from 'src/auth/strategies/jwt_rt.strategy';
 
 
 @Module({

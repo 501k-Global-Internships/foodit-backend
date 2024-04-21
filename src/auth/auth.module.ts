@@ -6,10 +6,13 @@ import { User } from 'src/user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt_at.strategy';
-import { RtStrategy } from './strategies/jwt_rf.strategy';
+import { RtStrategy } from './strategies/jwt_rt.strategy';
+import { VendorModule } from 'src/vendor/vendor.module';
+import { VendorAuth } from './vendorAuth/vendor.auth';
 
 @Module({
   imports: [
+    VendorModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -21,7 +24,7 @@ import { RtStrategy } from './strategies/jwt_rf.strategy';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, VendorAuth],
   providers: [AuthService, JwtStrategy, RtStrategy],
 })
 export class AuthModule {}

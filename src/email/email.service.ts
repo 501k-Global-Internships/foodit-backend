@@ -1,6 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @Injectable()
 export class EmailService {
@@ -21,6 +22,21 @@ Send Welcome Email
       template: './welcome', // `.ejs` extension is appended automatically
       context: {
         name: user.name,
+        confirmationUrl,
+      },
+    });
+  }
+
+  async sendVendorWelcomeEmail(user: Vendor, token: string) {
+    const confirmationUrl = `exmaple.com/auth/confrim?token=${token}`;
+
+    await this.mailService.sendMail({
+      to: user.businessemail,
+      from: '"FoodIt" <support@example.com>', // override default from,
+      subject: 'Welcome to FoodIt! Confirm your Email',
+      template: './welcome', // `.ejs` extension is appended automatically
+      context: {
+        name: user.businessname,
         confirmationUrl,
       },
     });

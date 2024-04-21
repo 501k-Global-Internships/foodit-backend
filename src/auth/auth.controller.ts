@@ -19,11 +19,14 @@ import {
 import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 import { Request } from 'express';
 import { JwtGuard } from './guards/jwt_at.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    ) {}
 
   /** API Endpoint for User Registration */
   @ApiBadRequestResponse()
@@ -57,5 +60,27 @@ export class AuthController {
   refresh(@Req() req: Request) {
     const user = req.user;
     return this.authService.refreshToken(user['refreshToken'], user['payload']);
+  }
+
+  @Get('facebook')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLogin() {}
+ 
+  @Get('facebook/redirect')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLoginRedirect(@Req() req: Request) {
+     // Handle the user data returned from Facebook
+     return req.user;
+  }
+ 
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleLogin() {}
+ 
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleLoginRedirect(@Req() req: Request) {
+     // Handle the user data returned from Google
+     return req.user;
   }
 }

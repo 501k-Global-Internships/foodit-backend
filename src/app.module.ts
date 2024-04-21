@@ -9,6 +9,7 @@ import { EmailModule } from './email/email.module';
 import { VendorModule } from './vendor/vendor.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Vendor } from './vendor/entities/vendor.entity';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { AppService } from './app.service';
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
-        entities: [User],
+        entities: [User, Vendor],
         synchronize: true,
       }),
     }),

@@ -18,6 +18,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors();
+
   // Setup Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('FOODIT')

@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { EmailModule } from './email/email.module';
-import { VendorModule } from './vendor/vendor.module';
+// import { VendorModule } from './vendor/vendor.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Vendor } from './vendor/entities/vendor.entity';
@@ -39,7 +39,7 @@ import { Vendor } from './vendor/entities/vendor.entity';
     AuthModule,
     AdminModule,
     EmailModule,
-    VendorModule,
+    // VendorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

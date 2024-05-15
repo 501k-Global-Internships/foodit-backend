@@ -9,16 +9,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto } from './dto/signup.dto';
-import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from '../dto/signup.dto';
+import { LoginDto } from '../dto/login/login.dto';
 import {
   ApiBadRequestResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { RefreshTokenGuard } from './guards/jwt_rt.guard';
+import { RefreshTokenGuard } from '../guards/jwt_rt.guard';
 import { Request } from 'express';
-import { JwtGuard } from './guards/jwt_at.guard';
+import { JwtGuard } from '../guards/jwt_at.guard';
+import { ForgotPasswordDto } from '../dto/forgotPassword/forgetPassword.dto';
+import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
 // import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Auth')
@@ -29,7 +31,7 @@ export class AuthController {
   /** API Endpoint for User Registration */
   @ApiBadRequestResponse()
   @Post('local/signup')
-  createUser(@Body() signupDetails: SignupDto) {
+  createUser(@Body() signupDetails: CreateUserDto) {
     return this.authService.createUser(signupDetails);
   }
 
@@ -51,38 +53,41 @@ export class AuthController {
   /** API Endpoint to Logout User */
   @Get('logout')
   @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request) {
     await this.authService.logout(req.user['id']);
     return 'You have successfully logout of the system, see you soon!';
   }
 
+  /**
+   * This endpoint is  called when a user forgots his/her password
+   * a 401 error is thrown if endpoint doesn't exist
+   * @param forgotPasswordData
+   */
+  @Post('password/forgot')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(
+    @Body() forgotPasswordData: ForgotPasswordDto,
+  ): Promise<string> {
+    return this.authService.forgetPassowrd(forgotPasswordData.email);
+  }
+
+  /**
+   * This endpoint is called when a user wants to reset his/her password
+   * @param resetData
+   */
+  @Post('password/rest')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() resetData: ResetPasswordDto): Promise<string> {
+    return this.authService.resetPassword(resetData);
+  }
+
   /** API Endpoint to get Refresh Tokens */
-  @Get('refresh')
+  @Get('refresh-token')
   @UseGuards(RefreshTokenGuard)
-  refresh(@Req() req: Request) {
+  @HttpCode(HttpStatus.OK)
+  refreshToken(@Req() req: Request) {
     const user = req.user;
     return this.authService.refreshToken(user['refreshToken'], user['payload']);
   }
-
-  // @Get('facebook')
-  // @UseGuards(AuthGuard('facebook'))
-  // async facebookLogin() {}
-
-  // @Get('facebook/redirect')
-  // @UseGuards(AuthGuard('facebook'))
-  // async facebookLoginRedirect(@Req() req: Request) {
-  //   // Handle the user data returned from Facebook
-  //   return req.user;
-  // }
-
-  // @Get('google')
-  // @UseGuards(AuthGuard('google'))
-  // async googleLogin() {}
-
-  // @Get('google/redirect')
-  // @UseGuards(AuthGuard('google'))
-  // async googleLoginRedirect(@Req() req: Request) {
-  //   // Handle the user data returned from Google
-  //   return req.user;
-  // }
 }

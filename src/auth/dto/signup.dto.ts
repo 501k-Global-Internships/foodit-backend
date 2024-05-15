@@ -1,6 +1,6 @@
 import { IsEmail, IsStrongPassword, MinLength } from 'class-validator';
 
-export class SignupDto {
+export class CreateUserDto {
   /** @example 'Ismail Tijani' */
   @MinLength(3)
   name: string;

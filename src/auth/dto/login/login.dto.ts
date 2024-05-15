@@ -1,7 +1,7 @@
 import { IsEmail, IsString } from 'class-validator';
 
 export class LoginDto {
-  /** @example example@gmail.com */
+  /** @example example@footit.com */
   @IsEmail()
   email: string;
 

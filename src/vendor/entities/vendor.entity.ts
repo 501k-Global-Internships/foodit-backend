@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { UserRole } from 'src/utils/typeDef.dto';
+import { UserRole } from 'src/shared/constants/typeDef.dto';
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';

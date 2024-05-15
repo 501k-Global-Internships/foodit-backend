@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { SignupDto } from 'src/auth/dto/signup.dto';
+import { CreateUserDto } from 'src/auth/dto/signup.dto';
 
-export class UpdateUserDto extends PartialType(SignupDto) {}
+export class UpdateUserDto extends PartialType(CreateUserDto) {}

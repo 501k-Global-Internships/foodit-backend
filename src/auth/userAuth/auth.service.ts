@@ -3,29 +3,32 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+// import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from '../dto/login/login.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
-import { SignupDto } from './dto/signup.dto';
+import { CreateUserDto } from '../dto/signup.dto';
 import { EmailService } from 'src/email/email.service';
-import { ConfigService } from '@nestjs/config';
-import { JwtPayload, Tokens } from 'src/utils/typeDef.dto';
-import { hashData } from 'src/utils/utils';
+// import { ConfigService } from '@nestjs/config';
+import { JwtPayload, Tokens } from 'src/shared/constants/typeDef.dto';
+import { HelperService } from 'src/shared/constants';
+import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
+import { UserLoginRO } from '../dto/login/adapter.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     // Inject TypeORM repository into the service class to enable interaction with the database
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    // Inject JTWService
-    private readonly jwtService: JwtService,
-    // Inject Config Service so as to access Environment variable
-    private readonly configService: ConfigService,
+    // // Inject JTWService
+    // private readonly jwtService: JwtService,
+    // // Inject Config Service so as to access Environment variable
+    // private readonly configService: ConfigService,
     // Inject EmailService
     private readonly emailService: EmailService,
+    private readonly helperService: HelperService,
   ) {}
 
   /* 
@@ -33,7 +36,7 @@ export class AuthService {
 User Registration Method
 ========================================
 */
-  async createUser(userDetails: SignupDto): Promise<Tokens> {
+  async createUser(userDetails: CreateUserDto): Promise<Tokens> {
     try {
       // Create a new user entity
       const newUser = this.userRepository.create(userDetails);
@@ -42,11 +45,11 @@ User Registration Method
       // Generate JWT token payload
       const payload = { sub: savedUser.id, email: savedUser.email };
       // Generate Tokens
-      const accessToken = await this.generateAccessToken(payload);
-      const refreshToken = await this.generateRefreshToken(payload);
+      const accessToken = await this.helperService.generateAccessToken(payload);
+      const refreshToken =
+        await this.helperService.generateRefreshToken(payload);
       // Send Welcome Email
       this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
-      console.log(accessToken);
 
       // Return Tokens
       return { accessToken, refreshToken };
@@ -60,13 +63,19 @@ User Registration Method
 User Login Method
 ========================================
 */
-  async login(loginDetails: LoginDto): Promise<Tokens> {
-    const payload = await this.findByCredentials(loginDetails);
+  async login(loginDetails: LoginDto): Promise<UserLoginRO> {
+    const user = await this.findUserByCredentials(loginDetails);
+    const payload = { sub: user.id, email: user.email };
     // Generate Tokens
-    const accessToken = await this.generateAccessToken(payload);
-    const refreshToken = await this.generateRefreshToken(payload);
+    const accessToken = await this.helperService.generateAccessToken(payload);
+    const refreshToken = await this.helperService.generateRefreshToken(payload);
+    const response = { ...user, accessToken, refreshToken };
     // Return Tokens
-    return { accessToken, refreshToken };
+    return new UserLoginRO({
+      status: 200,
+      message: 'Successful',
+      data: response,
+    });
   }
 
   /* 
@@ -77,6 +86,20 @@ User LogOut Method
 
   logout = async (id: number) =>
     await this.userRepository.update(id, { refreshToken: null });
+
+  //////////////////// Password Recovery Method ///////////////////////
+
+  forgetPassowrd = async (email: string) => {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) throw new BadRequestException('User does not exist!');
+    // this.emailService.sendPasswordRecoveryEmail(user);
+    return 'Password recovery link has been sent your your email, Kindly check your mail';
+  };
+
+  ////////////////////// Password Reset Method ///////////////////////
+  async resetPassword(resetData: ResetPasswordDto) {
+    return '';
+  }
 
   /* 
 =======================================
@@ -90,8 +113,9 @@ Refresh Token Method
     const user = await this.userRepository.findOneBy({ id: payload.sub });
 
     if (user && (await bcrypt.compare(refreshToken, user.refreshToken))) {
-      const accessToken = await this.generateAccessToken(payload);
-      const refreshToken = await this.generateRefreshToken(payload);
+      const accessToken = await this.helperService.generateAccessToken(payload);
+      const refreshToken =
+        await this.helperService.generateRefreshToken(payload);
       return { accessToken, refreshToken };
     }
     throw new ForbiddenException('Access Denied!!!');
@@ -102,42 +126,25 @@ Refresh Token Method
 Find User by credentials
 ========================================
 */
-  async findByCredentials({ email, password }: LoginDto): Promise<JwtPayload> {
+  async findUserByCredentials({ email, password }: LoginDto): Promise<User> {
     // Find User by email
     const user = await this.userRepository.findOneBy({ email });
     if (!user)
       throw new BadRequestException('User does not exist!, Kindly signup');
     // Validate password
     if (await bcrypt.compare(password, user.password)) {
-      const payload = { sub: user.id, email: user.email };
-      return payload;
+      return user;
     } else {
-      // Throw UnauthorizedException if login credentials are incorrect
       throw new BadRequestException(
         'Invalid Email or Password, Please check your login credentials',
       );
     }
   }
 
-  /* 
-================================================
-Generate Tokens (AccessToken and RefreshToken)
-================================================
-*/
-  generateAccessToken = (payload: JwtPayload) =>
-    this.jwtService.signAsync(payload);
-
-  async generateRefreshToken(payload: JwtPayload) {
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get<number>('REFRESH_TOKEN_EXPIRATION'),
-      secret: this.configService.get<string>('JWT_RT_SECRET'),
-    });
-    // Hash refreshToken and store in the database
-    const hashedRt = await hashData(refreshToken);
-    await this.userRepository.update(
-      { id: payload.sub },
-      { refreshToken: hashedRt },
-    );
-    return refreshToken;
-  }
+  /** 
+   * 
+  ================================================
+  Generate Tokens (AccessToken and RefreshToken)
+  ================================================
+  */
 }

@@ -7,10 +7,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt_at.strategy';
 import { RtStrategy } from './strategies/jwt_rt.strategy';
+// import { HelperService } from 'src/shared/constants';
+import { UserModule } from 'src/user/user.module';
+import { HelperService } from 'src/shared/constants/helper.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    // forwardRef(() => UserModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -20,8 +24,9 @@ import { RtStrategy } from './strategies/jwt_rt.strategy';
         signOptions: { expiresIn: 60 * 15 },
       }),
     }),
+    UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RtStrategy],
+  providers: [AuthService, JwtStrategy, RtStrategy, HelperService],
 })
 export class AuthModule {}

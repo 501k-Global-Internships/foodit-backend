@@ -1,48 +1,56 @@
-// import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-// import * as jwt from 'jsonwebtoken';
-// import { ConfigService } from '@nestjs/config';
-// import { ClientUserEntity } from '../client-user/client-user.entity';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtPayload, Tokens } from 'src/shared/constants';
+import { JwtService } from '@nestjs/jwt';
 
-// @Injectable()
-// export class JwtService {
-//   private readonly logger: Logger;
-//   constructor(
-//     private readonly configService: ConfigService
-//     ) {
-//       this.logger = new Logger(JwtService.name);
-//     }
+@Injectable()
+export class JwtHandler {
+  private readonly logger: Logger;
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
+  ) {
+    this.logger = new Logger(JwtService.name);
+  }
 
-//   private SECRET: string = this.configService.get<string>('SECRET');
+  private SECRET: string = this.config.get<string>('SECRET');
+  private RT_SECRET: string = this.config.get<string>('JWT_RT_SECRET');
+  private TOKEN_EXPIRATION = this.config.get<number>('TOKEN_EXPIRATION');
+  private RT_EXPIRATION = this.config.get<number>('REFRESH_TOKEN_EXPIRATION');
 
-//   generateAccessToken(email: string) {
-//     return jwt.sign({ email }, this.configService.get<string>('SECRET'), {
-//       expiresIn: '1h',
-//     });
-//   }
+  async generateTokens(payload: JwtPayload): Promise<Tokens> {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.SECRET,
+        expiresIn: this.TOKEN_EXPIRATION,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.RT_SECRET,
+        expiresIn: this.RT_EXPIRATION,
+      }),
+    ]);
 
-//   generateSuperAdminAccessToken(email: string) {
-//     return jwt.sign(
-//       { email, isSuperAdmin: true },
-//       this.configService.get<string>('SECRET'),
-//       { expiresIn: '1h' },
-//     );
-//   }
+    return { accessToken, refreshToken };
+  }
 
-//   generateResetToken(clientUser: ClientUserEntity) {
-//     const { email, resetToken } = clientUser;
-//     return jwt.sign(
-//       { email, resetToken },
-//       this.configService.get<string>('SECRET'),
-//       { expiresIn: '30d' },
-//     );
-//   }
+  async generateResetToken(email: string) {
+    const resetToken = await this.jwtService.signAsync(
+      { email },
+      {
+        secret: this.SECRET,
+        expiresIn: this.TOKEN_EXPIRATION,
+      },
+    );
 
-//   verifyToken(hash: string) {
-//     try {
-//       return jwt.verify(hash, this.SECRET);
-//     } catch (error) {
-//       this.logger.log("error occurred verifing token", error.message);
-//       throw new HttpException('Invalid Hash', HttpStatus.BAD_REQUEST);
-//     }
-//   }
-// }
+    return resetToken;
+  }
+
+  // verifyToken(hash: string) {
+  //   try {
+  //     return jwt.verify(hash, this.SECRET);
+  //   } catch (error) {
+  //     this.logger.log('error occurred verifing token', error.message);
+  //     throw new HttpException('Invalid Hash', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+}

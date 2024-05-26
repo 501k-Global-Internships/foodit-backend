@@ -21,6 +21,7 @@ import { Request } from 'express';
 import { JwtGuard } from '../guards/jwt_at.guard';
 import { ForgotPasswordDto } from '../dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
+import { ForgotPasswordRO } from '../dto/forgotPassword/adapter.dto';
 // import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Auth')
@@ -61,15 +62,14 @@ export class AuthController {
 
   /**
    * This endpoint is  called when a user forgots his/her password
-   * a 401 error is thrown if endpoint doesn't exist
    * @param forgotPasswordData
    */
   @Post('password/forgot')
   @HttpCode(HttpStatus.OK)
   forgotPassword(
     @Body() forgotPasswordData: ForgotPasswordDto,
-  ): Promise<string> {
-    return this.authService.forgetPassowrd(forgotPasswordData.email);
+  ): Promise<ForgotPasswordRO> {
+    return this.authService.forgotPassowrd(forgotPasswordData);
   }
 
   /**

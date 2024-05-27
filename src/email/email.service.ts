@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { PasswordRecoveryData } from 'src/shared/constants';
 import { User } from 'src/user/entities/user.entity';
 import { Vendor } from 'src/vendor/entities/vendor.entity';
 
@@ -38,6 +39,22 @@ Send Welcome Email
       context: {
         name: user.businessname,
         confirmationUrl,
+      },
+    });
+  }
+
+  async sendPasswordRecoveryEmail(data: PasswordRecoveryData) {
+    const { email, name, resetToken } = data;
+    const resetPasswordUrl = `exmaple.com/auth/confrim?token=${resetToken}`;
+
+    await this.mailService.sendMail({
+      to: email,
+      from: '"FoodIt" <support@example.com>', // override default from,
+      subject: 'Password Recovery Assistance!',
+      template: './welcome', // `.ejs` extension is appended automatically
+      context: {
+        name: name,
+        resetPasswordUrl,
       },
     });
   }

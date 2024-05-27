@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload, Tokens } from 'src/shared/constants';
 import { JwtService } from '@nestjs/jwt';
@@ -45,12 +45,12 @@ export class JwtHandler {
     return resetToken;
   }
 
-  // verifyToken(hash: string) {
-  //   try {
-  //     return jwt.verify(hash, this.SECRET);
-  //   } catch (error) {
-  //     this.logger.log('error occurred verifing token', error.message);
-  //     throw new HttpException('Invalid Hash', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+  verifyToken(token: string) {
+    try {
+      return this.jwtService.verifyAsync(token, { secret: this.SECRET });
+    } catch (error) {
+      this.logger.log('error occurred verifing token', error.message);
+      throw new BadRequestException('Invalid Token');
+    }
+  }
 }

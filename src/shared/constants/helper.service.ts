@@ -12,7 +12,7 @@ export class HelperService {
     this.SECRET = this.config.get('JWT_SECRET');
   }
 
-  async hashData(data: string) {
-    await bcrypt.hash(data, 10);
+  hashData(data: string) {
+    return bcrypt.hash(data, 10);
   }
 }

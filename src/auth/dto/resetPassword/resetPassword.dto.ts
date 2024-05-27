@@ -6,7 +6,7 @@ export class ResetPasswordDto {
    * @example 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVrcGF1Y2hlY2hpMUBnbWFpbC5jb20iLCJyZXNldFRva2VuIjoiY2dLZFZ6MUY3NmR5Q21zQXljMzZMIiwiaWF0IjoxNjI4MDk3MTE5LCJleHAiOjE2MzA2ODkxMTl9.UpaQqH2_Nkt028hArhgIDs6lMTpSOEhWQxtB7BYbIcU'
    */
   @IsJWT()
-  hash: string;
+  resetToken: string;
 
   /**
    * This is the new password

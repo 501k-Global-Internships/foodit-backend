@@ -4,18 +4,15 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-// import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoginDto } from '../dto/login/login.dto';
 import * as bcrypt from 'bcrypt';
-import crypto from 'crypto';
 import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from '../dto/signup.dto';
 import { EmailService } from 'src/email/email.service';
 // import { ConfigService } from '@nestjs/config';
 import { JwtPayload, Tokens } from 'src/shared/constants/typeDef.dto';
-// import { HelperService } from 'src/shared/constants';
 import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
 import { UserLoginRO } from '../dto/login/adapter.dto';
 import { HelperService } from 'src/shared/constants/helper.service';
@@ -115,10 +112,15 @@ User LogOut Method
           'Reset instruction will be sent to valid email!',
         );
       // Generate Reset Password Token
-      // const resetToken = this.helperService.generateAccessToken()
-      // // Hash token and send to resetPassword token field
-      // user.resetPasswordToken =
-      // this.emailService.sendPasswordRecoveryEmail(user);
+      const resetToken = await this.jwtService.generateResetToken(email);
+      // Hash token and send to resetPassword token field
+      const hashedToken = await this.helperService.hashData(resetToken);
+      user.resetPasswordToken = hashedToken;
+      this.emailService.sendPasswordRecoveryEmail({
+        email,
+        name: user.name,
+        resetToken,
+      });
       return new ForgotPasswordRO({
         status: 200,
         message: 'Successful',
@@ -131,7 +133,29 @@ User LogOut Method
 
   ////////////////////// Password Reset Method ///////////////////////
   async resetPassword(resetData: ResetPasswordDto) {
-    return '';
+    const { resetToken, newPassword, confirmPassword } = resetData;
+    try {
+      if (newPassword !== confirmPassword)
+        throw new BadRequestException('Password must be the same');
+      const payload = await this.jwtService.verifyToken(resetToken);
+      const user = await this.userRepository.findOneBy({ email: payload.sub });
+      if (
+        !user &&
+        (await bcrypt.compare(resetToken, user.resetPasswordToken))
+      ) {
+        throw new BadRequestException('Invalid Reset Password Token!!!');
+      }
+      user.password = newPassword;
+      user.resetPasswordToken = null;
+      return new ForgotPasswordRO({
+        status: 200,
+        message: 'Successful',
+        data: 'Your Password has been reset successfully, Kindly login with your new password',
+      });
+    } catch (error) {
+      console.log(JSON.stringify(error));
+      throw new InternalServerErrorException();
+    }
   }
 
   /* 
@@ -146,15 +170,9 @@ Refresh Token Method
     const user = await this.userRepository.findOneBy({ id: payload.sub });
 
     if (user && (await bcrypt.compare(refreshToken, user.refreshToken))) {
-      const accessToken = await this.helperService.generateAccessToken(payload);
-      const refreshToken = // Implement generating token from a single methos
-        await this.helperService.generateRefreshToken(payload);
-      // Hash refreshToken and store in the database
-      // const hashedRt = await this.helperService.hashData(refreshToken);
-      // await this.userRepository.update(
-      //   { id: payload.sub },
-      //   { refreshToken: hashedRt },
-      // );
+      const { accessToken, refreshToken } =
+        await this.jwtService.generateTokens(payload);
+      await this.updateRefreshToken(payload.sub, refreshToken);
       return { accessToken, refreshToken };
     }
     throw new ForbiddenException('Access Denied!!!');

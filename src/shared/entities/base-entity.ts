@@ -15,14 +15,11 @@ export class BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
-  @Column()
-  name: string;
-
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  phone: number;
+  // @Column()
+  // phone: number;
 
   @ApiHideProperty()
   @Column({ nullable: false })
@@ -36,6 +33,11 @@ export class BaseEntity {
   @Column({ nullable: true })
   @Exclude() //Exlcude refreshToken from response
   refreshToken: string;
+
+  @ApiHideProperty()
+  @Column({ nullable: true })
+  @Exclude() //Exlcude resetToken from response
+  resetPasswordToken: string;
 
   @CreateDateColumn()
   createdAt: Date;

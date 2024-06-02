@@ -6,10 +6,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserRole } from '../constants';
-import { User } from 'src/user/entities/user.entity';
+import { UserType } from '../constants';
 
-export class BaseEntity {
+export abstract class BaseEntity {
   /** The User Id (Primary Key)
    */
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -18,16 +17,13 @@ export class BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  // @Column()
-  // phone: number;
-
   @ApiHideProperty()
   @Column({ nullable: false })
   @Exclude() //Exlcude password from response
   password: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
-  role: UserRole;
+  @Column({ type: 'enum', enum: UserType, default: UserType.User })
+  userType: UserType;
 
   @ApiHideProperty()
   @Column({ nullable: true })
@@ -44,9 +40,4 @@ export class BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  //Enabling Serialization (Removing sensitive datas)
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
-  }
 }

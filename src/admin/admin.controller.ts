@@ -3,12 +3,12 @@ import { AdminService } from './admin.service';
 import { ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt_at.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { UserRole } from 'src/shared/constants/typeDef.dto';
+import { UserType } from 'src/shared/constants/typeDef.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
 @UseGuards(JwtGuard, RolesGuard)
-@SetMetadata('roles', [UserRole.Moderator, UserRole.Admin]) //Allowed Roles
+@SetMetadata('roles', [UserType.Moderator, UserType.Admin]) //Allowed Roles
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 

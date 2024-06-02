@@ -19,30 +19,38 @@ export class JwtHandler {
   private RT_EXPIRATION = this.config.get<number>('REFRESH_TOKEN_EXPIRATION');
 
   async generateTokens(payload: JwtPayload): Promise<Tokens> {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: this.SECRET,
-        expiresIn: this.TOKEN_EXPIRATION,
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: this.RT_SECRET,
-        expiresIn: this.RT_EXPIRATION,
-      }),
-    ]);
+    try {
+      const [accessToken, refreshToken] = await Promise.all([
+        this.jwtService.signAsync(payload, {
+          secret: this.SECRET,
+          expiresIn: this.TOKEN_EXPIRATION,
+        }),
+        this.jwtService.signAsync(payload, {
+          secret: this.RT_SECRET,
+          expiresIn: this.RT_EXPIRATION,
+        }),
+      ]);
 
-    return { accessToken, refreshToken };
+      return { accessToken, refreshToken };
+    } catch (error) {
+      this.logger.error(JSON.stringify(error));
+    }
   }
 
   async generateResetToken(email: string) {
-    const resetToken = await this.jwtService.signAsync(
-      { email },
-      {
-        secret: this.SECRET,
-        expiresIn: this.TOKEN_EXPIRATION,
-      },
-    );
+    try {
+      const resetToken = await this.jwtService.signAsync(
+        { email },
+        {
+          secret: this.SECRET,
+          expiresIn: this.TOKEN_EXPIRATION,
+        },
+      );
 
-    return resetToken;
+      return resetToken;
+    } catch (error) {
+      this.logger.error(JSON.stringify(error));
+    }
   }
 
   verifyToken(token: string) {

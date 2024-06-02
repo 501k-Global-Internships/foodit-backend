@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpCode,
@@ -7,6 +8,7 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../dto/signup.dto';
@@ -26,6 +28,8 @@ import { ForgotPasswordRO } from '../dto/forgotPassword/adapter.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
+//Removing sensitive through serialization
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

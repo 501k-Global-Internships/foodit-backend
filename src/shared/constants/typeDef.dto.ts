@@ -1,4 +1,4 @@
-export enum UserRole {
+export enum UserType {
   User = 'user',
   Admin = 'admin',
   Vendor = 'vendor',

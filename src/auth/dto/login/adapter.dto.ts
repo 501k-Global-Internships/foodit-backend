@@ -1,6 +1,6 @@
 import { UserLoginResponseDTO } from './response.dto';
 
-export class UserLoginRO {
+export class UserRO {
   /**
    * This is the return status of the response
    * @example 200
@@ -12,6 +12,8 @@ export class UserLoginRO {
    * @example "Successful"
    */
   private readonly message: string;
+
+  /** This is the return data of the response */
   private readonly data: UserLoginResponseDTO;
 
   constructor(response: AdapterDTO) {

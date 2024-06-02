@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,14 +15,16 @@ import { EmailService } from 'src/email/email.service';
 // import { ConfigService } from '@nestjs/config';
 import { JwtPayload, Tokens } from 'src/shared/constants/typeDef.dto';
 import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
-import { UserLoginRO } from '../dto/login/adapter.dto';
+// import { UserLoginRO } from '../dto/login/adapter.dto';
 import { HelperService } from 'src/shared/constants/helper.service';
 import { ForgotPasswordDto } from '../dto/forgotPassword/forgetPassword.dto';
 import { ForgotPasswordRO } from '../dto/forgotPassword/adapter.dto';
 import { JwtHandler } from '../jwt.service';
+import { UserRO } from '../dto/login/adapter.dto';
 
 @Injectable()
 export class AuthService {
+  private logger: Logger;
   constructor(
     // Inject TypeORM repository into the service class to enable interaction with the database
     @InjectRepository(User) private readonly userRepository: Repository<User>,
@@ -32,14 +35,16 @@ export class AuthService {
     // Inject EmailService
     private readonly emailService: EmailService,
     private readonly helperService: HelperService,
-  ) {}
+  ) {
+    this.logger = new Logger(AuthService.name);
+  }
 
   /* 
 =======================================
 User Registration Method
 ========================================
 */
-  async createUser(userDetails: CreateUserDto): Promise<UserLoginRO> {
+  async createUser(userDetails: CreateUserDto): Promise<UserRO> {
     try {
       // Create a new user entity
       const newUser = this.userRepository.create(userDetails);
@@ -53,12 +58,15 @@ User Registration Method
       await this.updateRefreshToken(payload.sub, refreshToken);
       // Send Welcome Email
       this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
-      const response = { ...savedUser, accessToken, refreshToken };
 
-      // return { ...response, accessToken, refreshToken };
-      //Change the name to a
-      return new UserLoginRO({
-        status: 200,
+      const response = {
+        ...savedUser.LoginResponseObject(),
+        accessToken,
+        refreshToken,
+      };
+
+      return new UserRO({
+        status: 201,
         message: 'Successful',
         data: response,
       });
@@ -72,7 +80,7 @@ User Registration Method
 User Login Method
 ========================================
 */
-  async login(loginDetails: LoginDto): Promise<UserLoginRO> {
+  async login(loginDetails: LoginDto): Promise<UserRO> {
     try {
       const user = await this.findUserByCredentials(loginDetails);
       const payload = { sub: user.id, email: user.email };
@@ -80,14 +88,21 @@ User Login Method
       const { accessToken, refreshToken } =
         await this.jwtService.generateTokens(payload);
       await this.updateRefreshToken(payload.sub, refreshToken);
-      const response = { ...user, accessToken, refreshToken };
+      const response = {
+        ...user.LoginResponseObject(),
+        accessToken,
+        refreshToken,
+      };
 
-      return new UserLoginRO({
+      return new UserRO({
         status: 200,
         message: 'Successful',
         data: response,
       });
-    } catch (error) {}
+    } catch (error) {
+      this.logger.error(JSON.stringify(error));
+      return error;
+    }
   }
 
   /* 
@@ -109,13 +124,14 @@ User LogOut Method
       const user = await this.userRepository.findOneBy({ email });
       if (!user)
         throw new BadRequestException(
-          'Reset instruction will be sent to valid email!',
+          'Reset instruction will be sent to only valid email!',
         );
       // Generate Reset Password Token
       const resetToken = await this.jwtService.generateResetToken(email);
       // Hash token and send to resetPassword token field
       const hashedToken = await this.helperService.hashData(resetToken);
       user.resetPasswordToken = hashedToken;
+      await this.userRepository.save(user);
       this.emailService.sendPasswordRecoveryEmail({
         email,
         name: user.name,
@@ -127,7 +143,11 @@ User LogOut Method
         data: 'Password recovery link has been sent your your email, Kindly check your mail',
       });
     } catch (error) {
-      throw new InternalServerErrorException(JSON.stringify(error));
+      this.logger.error(JSON.stringify(error));
+      // if (error instanceof BadRequestException) {
+      //   throw error; // Rethrow known error
+      // }
+      error instanceof BadRequestException? throw error: throw new InternalServerErrorException(error.message);
     }
   };
 

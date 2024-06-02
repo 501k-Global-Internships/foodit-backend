@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { UserRole } from 'src/shared/constants/typeDef.dto';
+import { UserType } from 'src/shared/constants/typeDef.dto';
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
@@ -22,8 +22,8 @@ export class Vendor {
   @Exclude() //Exlcude password from response
   password: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.Vendor })
-  role: UserRole;
+  @Column({ type: 'enum', enum: UserType, default: UserType.Vendor })
+  role: UserType;
 
   @ApiHideProperty()
   @Column({ nullable: true })

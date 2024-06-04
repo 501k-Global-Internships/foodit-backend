@@ -151,28 +151,28 @@ User LogOut Method
   ////////////////////// Password Reset Method ///////////////////////
   async resetPassword(resetData: ResetPasswordDto) {
     const { resetToken, newPassword, confirmPassword } = resetData;
+    //Compare passwords
+    if (newPassword !== confirmPassword)
+      throw new BadRequestException('Password must be the same');
+    //Verify Token
+    const payload = await this.jwtService.verifyToken(resetToken);
+    const user = await this.userRepository.findOneBy({ email: payload.sub });
+    if (!user && (await bcrypt.compare(resetToken, user.resetPasswordToken))) {
+      throw new BadRequestException('Invalid Reset Password Token!!!');
+    }
     try {
-      if (newPassword !== confirmPassword)
-        throw new BadRequestException('Password must be the same');
-      const payload = await this.jwtService.verifyToken(resetToken);
-      const user = await this.userRepository.findOneBy({ email: payload.sub });
-      if (
-        !user &&
-        (await bcrypt.compare(resetToken, user.resetPasswordToken))
-      ) {
-        throw new BadRequestException('Invalid Reset Password Token!!!');
-      }
       user.password = newPassword;
       user.resetPasswordToken = null;
-      return new ForgotPasswordRO({
-        status: 200,
-        message: 'Successful',
-        data: 'Your Password has been reset successfully, Kindly login with your new password',
-      });
+      this.userRepository.save(user);
     } catch (error) {
       console.log(JSON.stringify(error));
       throw new InternalServerErrorException();
     }
+    return new ForgotPasswordRO({
+      status: 200,
+      message: 'Successful',
+      data: 'Your Password has been reset successfully, Kindly login with your new password',
+    });
   }
 
   /* 

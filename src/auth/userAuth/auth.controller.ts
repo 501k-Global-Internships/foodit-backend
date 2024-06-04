@@ -80,7 +80,7 @@ export class AuthController {
    * This endpoint is called when a user wants to reset his/her password
    * @param resetData
    */
-  @Post('password/rest')
+  @Post('password/reset')
   @HttpCode(HttpStatus.OK)
   resetPassword(
     @Body() resetData: ResetPasswordDto,

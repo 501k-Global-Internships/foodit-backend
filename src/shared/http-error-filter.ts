@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 
 @Catch()
@@ -20,11 +21,16 @@ export class HttpErrorFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const responseError =
+      exception instanceof BadRequestException
+        ? this.formatValidationErrors(exception.getResponse())
+        : exception.message;
+
     const devErrorResponse: any = {
       success: false,
       error: {
         code: status,
-        responseMessage: exception.message || null,
+        responseMessage: responseError,
         timestamp: new Date().toISOString(),
         path: request.url,
         method: request.method,
@@ -34,9 +40,10 @@ export class HttpErrorFilter implements ExceptionFilter {
     const prodErrorResponse: any = {
       success: false,
       error: {
-        responseMessage: exception.message || null,
+        responseMessage: responseError,
       },
     };
+
     Logger.error(
       `${request.method} ${request.url}`,
       JSON.stringify(devErrorResponse),
@@ -47,5 +54,12 @@ export class HttpErrorFilter implements ExceptionFilter {
       .json(
         process.env.APP_ENV === 'dev' ? devErrorResponse : prodErrorResponse,
       );
+  }
+
+  private formatValidationErrors(response: any): string | any {
+    if (response && Array.isArray(response.message)) {
+      return response.message.map((msg: string) => msg);
+    }
+    return response;
   }
 }

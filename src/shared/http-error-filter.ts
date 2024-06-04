@@ -14,27 +14,27 @@ export class HttpErrorFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
-    let status = 0;
-    try {
-      status = exception.getStatus();
-    } catch (e) {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-    }
+
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
     const devErrorResponse: any = {
       success: false,
       error: {
         code: status,
+        responseMessage: exception.message || null,
         timestamp: new Date().toISOString(),
         path: request.url,
         method: request.method,
-        responseMessage: exception.message || exception.message,
       },
     };
 
     const prodErrorResponse: any = {
       success: false,
       error: {
-        responseMessage: exception.message || exception.message,
+        responseMessage: exception.message || null,
       },
     };
     Logger.error(
@@ -45,9 +45,7 @@ export class HttpErrorFilter implements ExceptionFilter {
     response
       .status(status)
       .json(
-        process.env.APP_ENV === 'staging'
-          ? devErrorResponse
-          : prodErrorResponse,
+        process.env.APP_ENV === 'dev' ? devErrorResponse : prodErrorResponse,
       );
   }
 }

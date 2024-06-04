@@ -51,7 +51,7 @@ Send Welcome Email
       to: email,
       from: '"FoodIt" <support@example.com>', // override default from,
       subject: 'Password Recovery Assistance!',
-      template: './welcome', // `.ejs` extension is appended automatically
+      template: './forgotPassword', // `.ejs` extension is appended automatically
       context: {
         name: name,
         resetPasswordUrl,

@@ -16,11 +16,13 @@ import { EmailService } from 'src/email/email.service';
 import { JwtPayload, Tokens } from 'src/shared/constants/typeDef.dto';
 import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
 // import { UserLoginRO } from '../dto/login/adapter.dto';
-import { HelperService } from 'src/shared/constants/helper.service';
+// import { HelperService } from 'src/shared/constants/helper.service';
 import { ForgotPasswordDto } from '../dto/forgotPassword/forgetPassword.dto';
 import { ForgotPasswordRO } from '../dto/forgotPassword/adapter.dto';
 import { JwtHandler } from '../jwt.service';
 import { UserRO } from '../dto/login/adapter.dto';
+import { HelperService } from 'src/shared/helper.service';
+import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
 
 @Injectable()
 export class AuthService {
@@ -45,34 +47,36 @@ User Registration Method
 ========================================
 */
   async createUser(userDetails: CreateUserDto): Promise<UserRO> {
+    let savedUser: User;
     try {
       // Create a new user entity
       const newUser = this.userRepository.create(userDetails);
       //Save the new user to database
-      const savedUser = await this.userRepository.save(newUser);
-      // Generate JWT token payload
-      const payload = { sub: savedUser.id, email: savedUser.email };
-      // Generate Tokens
-      const { accessToken, refreshToken } =
-        await this.jwtService.generateTokens(payload);
-      await this.updateRefreshToken(payload.sub, refreshToken);
-      // Send Welcome Email
-      this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
-
-      const response = {
-        ...savedUser.LoginResponseObject(),
-        accessToken,
-        refreshToken,
-      };
-
-      return new UserRO({
-        status: 201,
-        message: 'Successful',
-        data: response,
-      });
+      savedUser = await this.userRepository.save(newUser);
     } catch (error: any) {
-      return error.sqlMessage;
+      throw new DatabaseExceptionFilter(error);
     }
+    // Generate JWT token payload
+    const payload = { sub: savedUser.id, email: savedUser.email };
+    // Generate Tokens
+    const { accessToken, refreshToken } =
+      await this.jwtService.generateTokens(payload);
+    await this.updateRefreshToken(payload.sub, refreshToken);
+
+    // Send Welcome Email
+    this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
+
+    const response = {
+      ...savedUser.LoginResponseObject(),
+      accessToken,
+      refreshToken,
+    };
+
+    return new UserRO({
+      status: 201,
+      message: 'Successful',
+      data: response,
+    });
   }
 
   /* 
@@ -81,28 +85,23 @@ User Login Method
 ========================================
 */
   async login(loginDetails: LoginDto): Promise<UserRO> {
-    try {
-      const user = await this.findUserByCredentials(loginDetails);
-      const payload = { sub: user.id, email: user.email };
-      // Generate Tokens
-      const { accessToken, refreshToken } =
-        await this.jwtService.generateTokens(payload);
-      await this.updateRefreshToken(payload.sub, refreshToken);
-      const response = {
-        ...user.LoginResponseObject(),
-        accessToken,
-        refreshToken,
-      };
+    const user = await this.findUserByCredentials(loginDetails);
+    const payload = { sub: user.id, email: user.email };
+    // Generate Tokens
+    const { accessToken, refreshToken } =
+      await this.jwtService.generateTokens(payload);
+    await this.updateRefreshToken(payload.sub, refreshToken);
+    const response = {
+      ...user.LoginResponseObject(),
+      accessToken,
+      refreshToken,
+    };
 
-      return new UserRO({
-        status: 200,
-        message: 'Successful',
-        data: response,
-      });
-    } catch (error) {
-      this.logger.error(JSON.stringify(error));
-      return error;
-    }
+    return new UserRO({
+      status: 200,
+      message: 'Successful',
+      data: response,
+    });
   }
 
   /* 
@@ -119,36 +118,34 @@ User LogOut Method
   forgotPassowrd = async (
     details: ForgotPasswordDto,
   ): Promise<ForgotPasswordRO> => {
+    const { email } = details;
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user)
+      throw new BadRequestException(
+        'Reset instruction will be sent to only valid email!',
+      );
+    // Generate Reset Password Token
+    const resetToken = await this.jwtService.generateResetToken(email);
+    // Hash token and send to resetPassword token field
+    const hashedToken = await this.helperService.hashData(resetToken);
+    user.resetPasswordToken = hashedToken;
+
     try {
-      const { email } = details;
-      const user = await this.userRepository.findOneBy({ email });
-      if (!user)
-        throw new BadRequestException(
-          'Reset instruction will be sent to only valid email!',
-        );
-      // Generate Reset Password Token
-      const resetToken = await this.jwtService.generateResetToken(email);
-      // Hash token and send to resetPassword token field
-      const hashedToken = await this.helperService.hashData(resetToken);
-      user.resetPasswordToken = hashedToken;
       await this.userRepository.save(user);
-      this.emailService.sendPasswordRecoveryEmail({
-        email,
-        name: user.name,
-        resetToken,
-      });
-      return new ForgotPasswordRO({
-        status: 200,
-        message: 'Successful',
-        data: 'Password recovery link has been sent your your email, Kindly check your mail',
-      });
     } catch (error) {
-      this.logger.error(JSON.stringify(error));
-      // if (error instanceof BadRequestException) {
-      //   throw error; // Rethrow known error
-      // }
-      error instanceof BadRequestException? throw error: throw new InternalServerErrorException(error.message);
+      throw new DatabaseExceptionFilter(error);
     }
+
+    this.emailService.sendPasswordRecoveryEmail({
+      email,
+      name: user.name,
+      resetToken,
+    });
+    return new ForgotPasswordRO({
+      status: 200,
+      message: 'Successful',
+      data: 'Password recovery link has been sent your your email, Kindly check your mail',
+    });
   };
 
   ////////////////////// Password Reset Method ///////////////////////
@@ -226,7 +223,11 @@ Update Refresh Token
   async updateRefreshToken(id: number, refreshToken: string) {
     // Hash refreshToken and store in the database
     const hashedRt = await this.helperService.hashData(refreshToken);
-    await this.userRepository.update({ id }, { refreshToken: hashedRt });
+    try {
+      await this.userRepository.update({ id }, { refreshToken: hashedRt });
+    } catch (error) {
+      throw new DatabaseExceptionFilter(error);
+    }
   }
   /** 
    * 

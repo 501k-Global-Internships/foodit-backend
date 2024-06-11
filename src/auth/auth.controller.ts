@@ -10,21 +10,20 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from '../dto/signup.dto';
-import { LoginDto } from '../dto/login/login.dto';
+import { CreateUserDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login/login.dto';
 import {
   ApiBadRequestResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { RefreshTokenGuard } from '../guards/jwt_rt.guard';
+import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 import { Request } from 'express';
-import { JwtGuard } from '../guards/jwt_at.guard';
-import { ForgotPasswordDto } from '../dto/forgotPassword/forgetPassword.dto';
-import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
-import { ForgotPasswordRO } from '../dto/forgotPassword/adapter.dto';
-// import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from './guards/jwt_at.guard';
+import { ForgotPasswordDto } from './dto/forgotPassword/forgetPassword.dto';
+import { ResetPasswordDto } from './dto/resetPassword/resetPassword.dto';
+import { ForgotPasswordRO } from './dto/forgotPassword/adapter.dto';
+import { AuthService } from './auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')

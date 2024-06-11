@@ -1,12 +1,31 @@
-import { IsEmail, IsStrongPassword, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsNumberString,
+  IsString,
+  IsStrongPassword,
+  MinLength,
+} from 'class-validator';
 
 export class VendorSignupDto {
+  @IsNotEmpty()
+  @IsString()
   @MinLength(3)
-  businessname: string;
+  businessName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  businessAddress: string;
 
   @IsEmail()
-  businessemail: string;
+  @IsNotEmpty()
+  email: string;
 
+  @IsNotEmpty()
+  @IsNumberString()
+  phoneNumber: string;
+
+  @IsNotEmpty()
   @IsStrongPassword({
     minLength: 8,
     minNumbers: 1,

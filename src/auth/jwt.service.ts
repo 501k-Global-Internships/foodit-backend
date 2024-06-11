@@ -10,13 +10,13 @@ export class JwtHandler {
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
   ) {
-    this.logger = new Logger(JwtService.name);
+    this.logger = new Logger(JwtHandler.name);
   }
 
   private SECRET: string = this.config.get<string>('SECRET');
   private RT_SECRET: string = this.config.get<string>('JWT_RT_SECRET');
-  private TOKEN_EXPIRATION = this.config.get<number>('TOKEN_EXPIRATION');
-  private RT_EXPIRATION = this.config.get<number>('REFRESH_TOKEN_EXPIRATION');
+  private TOKEN_EXPIRATION = this.config.get<string>('TOKEN_EXPIRATION');
+  private RT_EXPIRATION = this.config.get<string>('REFRESH_TOKEN_EXPIRATION');
 
   async generateTokens(payload: JwtPayload): Promise<Tokens> {
     try {
@@ -46,19 +46,22 @@ export class JwtHandler {
           expiresIn: this.TOKEN_EXPIRATION,
         },
       );
-
       return resetToken;
     } catch (error) {
       this.logger.error(JSON.stringify(error));
     }
   }
 
-  verifyToken(token: string) {
+  async verifyToken(token: string) {
     try {
-      return this.jwtService.verifyAsync(token, { secret: this.SECRET });
+      return await this.jwtService.verifyAsync(token, { secret: this.SECRET });
     } catch (error) {
-      this.logger.log('error occurred verifing token', error.message);
-      throw new BadRequestException('Invalid Token');
+      this.logger.log('error occurred verifying token', error.message);
+      if (error.name === 'TokenExpiredError') {
+        throw new BadRequestException('Token has expired');
+      } else {
+        throw new BadRequestException('Invalid Token');
+      }
     }
   }
 }

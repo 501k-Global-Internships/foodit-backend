@@ -7,20 +7,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LoginDto } from '../dto/login/login.dto';
+import { LoginDto } from './dto/login/login.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
-import { CreateUserDto } from '../dto/signup.dto';
+import { CreateUserDto } from './dto/signup.dto';
 import { EmailService } from 'src/email/email.service';
-// import { ConfigService } from '@nestjs/config';
 import { JwtPayload, Tokens } from 'src/shared/constants/typeDef.dto';
-import { ResetPasswordDto } from '../dto/resetPassword/resetPassword.dto';
-// import { UserLoginRO } from '../dto/login/adapter.dto';
-// import { HelperService } from 'src/shared/constants/helper.service';
-import { ForgotPasswordDto } from '../dto/forgotPassword/forgetPassword.dto';
-import { ForgotPasswordRO } from '../dto/forgotPassword/adapter.dto';
-import { JwtHandler } from '../jwt.service';
-import { UserRO } from '../dto/login/adapter.dto';
+import { ResetPasswordDto } from './dto/resetPassword/resetPassword.dto';
+import { ForgotPasswordDto } from './dto/forgotPassword/forgetPassword.dto';
+import { ForgotPasswordRO } from './dto/forgotPassword/adapter.dto';
+import { JwtHandler } from './jwt.service';
+import { UserRO } from './dto/login/adapter.dto';
 import { HelperService } from 'src/shared/helper.service';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
 
@@ -32,8 +29,6 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     // // Inject JTWService
     private readonly jwtService: JwtHandler,
-    // // Inject Config Service so as to access Environment variable
-    // private readonly configService: ConfigService,
     // Inject EmailService
     private readonly emailService: EmailService,
     private readonly helperService: HelperService,
@@ -110,10 +105,15 @@ User LogOut Method
 ========================================
 */
 
-  logout = async (id: number) =>
+  async logout(id: number) {
     await this.userRepository.update(id, { refreshToken: null });
+  }
 
-  //////////////////// Password Recovery Method ///////////////////////
+  /* 
+=======================================
+Password Recovery Method
+========================================
+*/
 
   forgotPassowrd = async (
     details: ForgotPasswordDto,
@@ -148,7 +148,11 @@ User LogOut Method
     });
   };
 
-  ////////////////////// Password Reset Method ///////////////////////
+  /* 
+=======================================
+Password Reset Method
+========================================
+*/
   async resetPassword(resetData: ResetPasswordDto) {
     const { resetToken, newPassword, confirmPassword } = resetData;
     //Compare passwords
@@ -160,6 +164,7 @@ User LogOut Method
     if (!user && (await bcrypt.compare(resetToken, user.resetPasswordToken))) {
       throw new BadRequestException('Invalid Reset Password Token!!!');
     }
+
     try {
       user.password = newPassword;
       user.resetPasswordToken = null;
@@ -229,10 +234,4 @@ Update Refresh Token
       throw new DatabaseExceptionFilter(error);
     }
   }
-  /** 
-   * 
-  ================================================
-  Generate Tokens (AccessToken and RefreshToken)
-  ================================================
-  */
 }

@@ -6,12 +6,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { EmailModule } from './email/email.module';
-// import { VendorModule } from './vendor/vendor.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Vendor } from './vendor/entities/vendor.entity';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpErrorFilter } from './shared/http-error-filter';
+import { VendorModule } from './vendor/vendor.module';
 
 @Module({
   imports: [
@@ -41,7 +41,7 @@ import { HttpErrorFilter } from './shared/http-error-filter';
     AuthModule,
     AdminModule,
     EmailModule,
-    // VendorModule,
+    VendorModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],

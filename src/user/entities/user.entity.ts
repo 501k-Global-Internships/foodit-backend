@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { BeforeInsert, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities';
 import { UserLoginResponseDTO } from 'src/auth/dto/login/response.dto';
 
@@ -13,21 +13,14 @@ export class User extends BaseEntity {
 
   //Hashing User plain text password before saving using Entity Listener
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 8);
   }
 
   LoginResponseObject(): UserLoginResponseDTO {
-    const {
-      id,
-      email,
-      name,
-      createdAt,
-      phoneNumber,
-      updatedAt,
-      userType,
-      // refreshToken,
-    } = this;
+    const { id, email, name, createdAt, phoneNumber, updatedAt, userType } =
+      this;
     return {
       id,
       email,
@@ -36,7 +29,6 @@ export class User extends BaseEntity {
       userType,
       createdAt,
       updatedAt,
-      // refreshToken,
     };
   }
 
@@ -46,14 +38,3 @@ export class User extends BaseEntity {
     Object.assign(this, partial);
   }
 }
-
-// export interface IUserRO {
-//   id: number;
-//   email: string;
-//   name: string;
-//   phoneNumber: string;
-//   userType: string;
-//   refreshToken: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }

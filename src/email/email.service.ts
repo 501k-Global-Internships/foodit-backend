@@ -28,16 +28,31 @@ Send Welcome Email
     });
   }
 
-  async sendVendorWelcomeEmail(user: Vendor, token: string) {
+  async sendVendorWelcomeEmail(vendor: Vendor, token: string) {
     const confirmationUrl = `exmaple.com/auth/confrim?token=${token}`;
 
     await this.mailService.sendMail({
-      to: user.businessemail,
+      to: vendor.email,
       from: '"FoodIt" <support@example.com>', // override default from,
       subject: 'Welcome to FoodIt! Confirm your Email',
       template: './welcome', // `.ejs` extension is appended automatically
       context: {
-        name: user.businessname,
+        name: vendor.businessAddress,
+        confirmationUrl,
+      },
+    });
+  }
+
+  async validationMail(vendor: Vendor, token: string) {
+    const confirmationUrl = `exmaple.com/auth/confrim?token=${token}`;
+
+    await this.mailService.sendMail({
+      to: vendor.email,
+      from: '"FoodIt" <support@example.com>', // override default from,
+      subject: 'Welcome to FoodIt! Confirm your Email',
+      template: './welcome', // `.ejs` extension is appended automatically
+      context: {
+        name: vendor.businessAddress,
         confirmationUrl,
       },
     });

@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserType } from '../constants';
 
 export abstract class BaseEntity {
   /** The User Id (Primary Key)
@@ -21,9 +20,6 @@ export abstract class BaseEntity {
   @Column({ nullable: false })
   @Exclude() //Exlcude password from response
   password: string;
-
-  @Column({ type: 'enum', enum: UserType, default: UserType.User })
-  userType: UserType;
 
   @ApiHideProperty()
   @Column({ nullable: true })

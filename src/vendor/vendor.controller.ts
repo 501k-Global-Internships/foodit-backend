@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -16,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
 import { VendorService } from './vendor.service';
+import { ConfirmAccountDto } from './dto/confirmAccount.dto';
 // import { RefreshTokenGuard } from '../guards/jwt_rt.guard';
 // import { Request } from 'express';
 // import { JwtGuard } from '../guards/jwt_at.guard';
@@ -35,12 +37,19 @@ export class VendorController {
     return this.vendorService.createVendor(signupDetails);
   }
 
+  @Get('account_activation')
+  @HttpCode(HttpStatus.OK)
+  confirmAccount(@Param() paramData: ConfirmAccountDto) {
+    const { confirmationCode } = paramData;
+    return this.vendorService.confirmAccount(confirmationCode);
+  }
+
   /** API Endpoint to Login Vendor */
   // @ApiUnauthorizedResponse({
   //   description:
   //     'Invalid Email or Password, Please check your login credentials',
   // })
-  // @Post('vendor/login')
+  // @Post('login')
   // @HttpCode(HttpStatus.OK)
   // Login(@Body() loginDetails: vendorLoginDto) {
   //   return this.vendorService.login(loginDetails);

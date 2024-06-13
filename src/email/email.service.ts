@@ -28,17 +28,29 @@ Send Welcome Email
     });
   }
 
-  async sendVendorWelcomeEmail(vendor: Vendor, token: string) {
-    const confirmationUrl = `exmaple.com/auth/confrim?token=${token}`;
+  async sendAccountActivationCode(vendor: Vendor, confirmationCode: string) {
+    const confirmationUrl = `https://foodit-cpig.onrender.com/auth/vendor/account_activation?token=${confirmationCode}`;
 
     await this.mailService.sendMail({
       to: vendor.email,
       from: '"FoodIt" <support@example.com>', // override default from,
-      subject: 'Welcome to FoodIt! Confirm your Email',
-      template: './welcome', // `.ejs` extension is appended automatically
+      subject: 'ACCOUNT ACTIVATION',
+      template: './accountActivation', // `.ejs` extension is appended automatically
       context: {
-        name: vendor.businessAddress,
+        name: vendor.businessName,
         confirmationUrl,
+      },
+    });
+  }
+
+  async sendAccountSuccessEmail(email: string, businessName: string) {
+    await this.mailService.sendMail({
+      to: email,
+      from: '"FoodIt" <support@example.com>', // override default from,
+      subject: 'ACCOUNT ACTIVATION SUCCESSFUL',
+      template: './accountActivationSuccess', // `.ejs` extension is appended automatically
+      context: {
+        name: businessName,
       },
     });
   }

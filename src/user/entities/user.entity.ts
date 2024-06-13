@@ -2,6 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities';
 import { UserLoginResponseDTO } from 'src/auth/dto/login/response.dto';
+import { UserType } from 'src/shared/constants';
 
 @Entity()
 export class User extends BaseEntity {
@@ -10,6 +11,9 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   phoneNumber: string;
+
+  @Column({ type: 'enum', enum: UserType, default: UserType.User })
+  userType: UserType;
 
   //Hashing User plain text password before saving using Entity Listener
   @BeforeInsert()

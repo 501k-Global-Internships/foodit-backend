@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
 import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { HelperService } from 'src/shared/helper.service';
 import { EmailService } from 'src/email/email.service';
 import { JwtHandler } from 'src/auth/jwt.service';
+import { StatusType } from 'src/shared/constants';
+import crypto from 'crypto';
 
 @Injectable()
 export class VendorService {
@@ -23,25 +25,55 @@ export class VendorService {
 
   async createVendor(vendorDetails: VendorSignupDto) {
     let savedVendor: Vendor;
+    const confirmationCode = crypto.randomBytes(20).toString('hex');
     try {
-      // Create a new user entity
-      const newVendor = this.vendorRepository.create(vendorDetails);
-      //Save the new user to database
+      const newVendor = this.vendorRepository.create({
+        ...vendorDetails,
+        confirmationCode,
+      });
+
       savedVendor = await this.vendorRepository.save(newVendor);
     } catch (error: any) {
       throw new DatabaseExceptionFilter(error);
     }
     // Generate JWT token payload
-    const payload = { sub: savedVendor.id, email: savedVendor.email };
-    // Generate Tokens
-    const { accessToken, refreshToken } =
-      await this.jwtService.generateTokens(payload);
-    await this.updateRefreshToken(payload.sub, refreshToken);
+    // const payload = { sub: savedVendor.id, email: savedVendor.email };
+    // // Generate Tokens
+    // const { accessToken, refreshToken } =
+    //   await this.jwtService.generateTokens(payload);
+    // await this.updateRefreshToken(payload.sub, refreshToken);
 
-    // Send Welcome Email
-    await this.emailService.validationMail(savedVendor, accessToken);
+    // Send Confirmation mail to new Vendor
+    await this.emailService.sendAccountActivationCode(
+      savedVendor,
+      confirmationCode,
+    );
 
-    return 'Validation email sent, kindly check your mail and validate';
+    return 'Activation email sent, kindly check your mail and activate your account';
+  }
+
+  async confirmAccount(confirmationCode: string) {
+    const vendor = await this.vendorRepository.findOneBy({ confirmationCode });
+    if (!vendor)
+      throw new BadRequestException('Invalid or Expired confirmation code');
+
+    const updateData = {
+      status: StatusType.ACTIVATED,
+      confirmationCode: null,
+    };
+
+    try {
+      await this.vendorRepository.update({ confirmationCode }, updateData);
+    } catch (error) {
+      throw new DatabaseExceptionFilter(error);
+    }
+    //Send Account confirmation Success mail
+    this.emailService.sendAccountSuccessEmail(
+      vendor.email,
+      vendor.businessName,
+    );
+
+    return 'Account Activation was successful, Kindly login';
   }
 
   async updateRefreshToken(id: number, refreshToken: string) {

@@ -1,22 +1,26 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
-import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
+import { VendorSignupDto } from 'src/vendorAuth/dto/vendor-signup.dto';
+import { Vendor } from 'src/vendorAuth/entities/vendor.entity';
 import { Repository } from 'typeorm';
 import { HelperService } from 'src/shared/helper.service';
 import { EmailService } from 'src/email/email.service';
-import { JwtHandler } from 'src/auth/jwt.service';
-import { StatusType, Tokens } from 'src/shared/constants';
+import { JwtHandler } from 'src/userAuth/jwt.service';
+import { JwtPayload, StatusType, Tokens } from 'src/shared/constants';
 import crypto from 'crypto';
-import { LoginDto } from 'src/auth/dto/login/login.dto';
+import { LoginDto } from 'src/userAuth/dto/login/login.dto';
 import * as bcrypt from 'bcrypt';
+import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
+import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 
 @Injectable()
 export class VendorService {
@@ -148,6 +152,73 @@ find Vendor By Credentials Method
 
   /* 
 =======================================
+Password Recovery Method
+========================================
+*/
+
+  forgotPassowrd = async (details: ForgotPasswordDto): Promise<string> => {
+    const { email } = details;
+    const vendor = await this.vendorRepository.findOneBy({ email });
+    if (!vendor)
+      throw new BadRequestException(
+        'Reset instruction will be sent to only valid email!',
+      );
+    // Generate Reset Password Token
+    const resetToken = await this.jwtService.generateResetToken(email);
+    // Hash token and send to resetPassword token field
+    const hashedToken = await this.helperService.hashData(resetToken);
+    vendor.resetPasswordToken = hashedToken;
+
+    try {
+      await this.vendorRepository.save(vendor);
+    } catch (error) {
+      throw new DatabaseExceptionFilter(error);
+    }
+
+    this.emailService.sendPasswordRecoveryEmail({
+      email,
+      name: vendor.businessName,
+      resetToken,
+    });
+    return 'Password recovery link has been sent your your email, Kindly check your mail';
+  };
+
+  /* 
+=======================================
+Password Reset Method
+========================================
+*/
+  async resetPassword(resetData: ResetPasswordDto) {
+    const { resetToken, newPassword, confirmPassword } = resetData;
+    //Compare passwords
+    if (newPassword !== confirmPassword)
+      //Do the validation is DTO
+      throw new BadRequestException('Password must be the same');
+    //Verify Token
+    const payload = await this.jwtService.verifyToken(resetToken);
+    const vendor = await this.vendorRepository.findOneBy({
+      email: payload.sub,
+    });
+    if (
+      !vendor &&
+      (await bcrypt.compare(resetToken, vendor.resetPasswordToken))
+    ) {
+      throw new BadRequestException('Invalid Reset Password Token!!!');
+    }
+
+    try {
+      vendor.password = newPassword;
+      vendor.resetPasswordToken = null;
+      this.vendorRepository.save(vendor);
+    } catch (error) {
+      console.log(JSON.stringify(error));
+      throw new InternalServerErrorException();
+    }
+    return 'Your Password has been reset successfully, Kindly login with your new password';
+  }
+
+  /* 
+=======================================
 Refresh Token Method
 ========================================
 */
@@ -155,9 +226,9 @@ Refresh Token Method
     refreshToken: string,
     payload: JwtPayload,
   ): Promise<Tokens> {
-    const user = await this.vendorRepository.findOneBy({ id: payload.sub });
+    const vendor = await this.vendorRepository.findOneBy({ id: payload.sub });
 
-    if (user && (await bcrypt.compare(refreshToken, user.refreshToken))) {
+    if (vendor && (await bcrypt.compare(refreshToken, vendor.refreshToken))) {
       const { accessToken, refreshToken } =
         await this.jwtService.generateTokens(payload);
       await this.updateRefreshToken(payload.sub, refreshToken);

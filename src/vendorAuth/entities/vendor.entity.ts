@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from '../../shared/entities/base-entity';
-import { VendorLoginResponseDTO } from '../dto/login-response.dto';
+// import { VendorLoginResponseDTO } from '../dto/login-response.dto';
 import { StatusType, UserType } from 'src/shared/constants';
 import { Exclude } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
@@ -39,28 +39,28 @@ export class Vendor extends BaseEntity {
     this.password = await bcrypt.hash(this.password, 8);
   }
 
-  LoginResponseObject(): VendorLoginResponseDTO {
-    const {
-      id,
-      email,
-      businessName,
-      businessAddress,
-      createdAt,
-      phoneNumber,
-      updatedAt,
-      userType,
-    } = this;
-    return {
-      id,
-      email,
-      businessName,
-      phoneNumber,
-      businessAddress,
-      userType,
-      createdAt,
-      updatedAt,
-    };
-  }
+  // LoginResponseObject(): VendorLoginResponseDTO {
+  //   const {
+  //     id,
+  //     email,
+  //     businessName,
+  //     businessAddress,
+  //     createdAt,
+  //     phoneNumber,
+  //     updatedAt,
+  //     userType,
+  //   } = this;
+  //   return {
+  //     id,
+  //     email,
+  //     businessName,
+  //     phoneNumber,
+  //     businessAddress,
+  //     userType,
+  //     createdAt,
+  //     updatedAt,
+  //   };
+  // }
 
   //Enabling Serialization (Removing sensitive datas)
   constructor(partial: Partial<Vendor>) {

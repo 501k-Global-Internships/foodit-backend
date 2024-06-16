@@ -1,7 +1,7 @@
 import { Controller, Get, SetMetadata, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtGuard } from 'src/auth/guards/jwt_at.guard';
+import { JwtGuard } from 'src/userAuth/guards/jwt_at.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { UserType } from 'src/shared/constants/typeDef.dto';
 

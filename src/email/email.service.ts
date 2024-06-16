@@ -2,7 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { PasswordRecoveryData } from 'src/shared/constants';
 import { User } from 'src/user/entities/user.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
+import { Vendor } from 'src/vendorAuth/entities/vendor.entity';
 
 @Injectable()
 export class EmailService {

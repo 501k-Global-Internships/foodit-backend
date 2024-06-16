@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from 'src/auth/guards/jwt_at.guard';
+import { JwtGuard } from 'src/userAuth/guards/jwt_at.guard';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';

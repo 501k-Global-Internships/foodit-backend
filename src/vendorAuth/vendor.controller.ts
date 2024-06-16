@@ -15,13 +15,15 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
+import { VendorSignupDto } from 'src/vendorAuth/dto/vendor-signup.dto';
 import { VendorService } from './vendor.service';
 import { ConfirmAccountDto } from './dto/confirmAccount.dto';
-import { LoginDto } from 'src/auth/dto/login/login.dto';
-import { VendorGuard } from 'src/auth/vendorGuards/vendor_jwt_at.guard';
+import { LoginDto } from 'src/userAuth/dto/login/login.dto';
+import { VendorGuard } from 'src/userAuth/vendorGuards/vendor_jwt_at.guard';
 import { Request } from 'express';
-import { RefreshTokenGuard } from 'src/auth/guards/jwt_rt.guard';
+import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
+import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
+import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 // import { RefreshTokenGuard } from '../guards/jwt_rt.guard';
 // import { Request } from 'express';
 // import { JwtGuard } from '../guards/jwt_at.guard';
@@ -64,6 +66,28 @@ export class VendorController {
   @UseGuards(VendorGuard)
   async Logout(@Req() req: Request) {
     return this.vendorService.logout(req.user?.id);
+  }
+
+  /**
+   * This endpoint is  called when a vendor forgots his/her password
+   * @param forgotPasswordData
+   */
+  @Post('password/forgot')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(
+    @Body() forgotPasswordData: ForgotPasswordDto,
+  ): Promise<string> {
+    return this.vendorService.forgotPassowrd(forgotPasswordData);
+  }
+
+  /**
+   * This endpoint is called when a vendor wants to reset his/her password
+   * @param resetData
+   */
+  @Post('password/reset')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() resetData: ResetPasswordDto): Promise<string> {
+    return this.vendorService.resetPassword(resetData);
   }
 
   /** API Endpoint to get Refresh Tokens */

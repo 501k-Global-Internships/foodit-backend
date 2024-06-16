@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities';
-import { UserLoginResponseDTO } from 'src/auth/dto/login/response.dto';
+import { UserLoginResponseDTO } from 'src/userAuth/dto/login/response.dto';
 import { UserType } from 'src/shared/constants';
 
 @Entity()

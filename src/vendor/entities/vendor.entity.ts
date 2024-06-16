@@ -3,6 +3,8 @@ import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from '../../shared/entities/base-entity';
 import { VendorLoginResponseDTO } from '../dto/login-response.dto';
 import { StatusType, UserType } from 'src/shared/constants';
+import { Exclude } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Vendor extends BaseEntity {
@@ -15,6 +17,8 @@ export class Vendor extends BaseEntity {
   @Column()
   phoneNumber: string;
 
+  @ApiHideProperty()
+  @Exclude()
   @Column({ nullable: true })
   confirmationCode: string;
 

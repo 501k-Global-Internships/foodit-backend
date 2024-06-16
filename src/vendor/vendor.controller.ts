@@ -18,6 +18,10 @@ import {
 import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
 import { VendorService } from './vendor.service';
 import { ConfirmAccountDto } from './dto/confirmAccount.dto';
+import { LoginDto } from 'src/auth/dto/login/login.dto';
+import { VendorGuard } from 'src/auth/vendorGuards/vendor_jwt_at.guard';
+import { Request } from 'express';
+import { RefreshTokenGuard } from 'src/auth/guards/jwt_rt.guard';
 // import { RefreshTokenGuard } from '../guards/jwt_rt.guard';
 // import { Request } from 'express';
 // import { JwtGuard } from '../guards/jwt_at.guard';
@@ -45,32 +49,31 @@ export class VendorController {
   }
 
   /** API Endpoint to Login Vendor */
-  // @ApiUnauthorizedResponse({
-  //   description:
-  //     'Invalid Email or Password, Please check your login credentials',
-  // })
-  // @Post('login')
-  // @HttpCode(HttpStatus.OK)
-  // Login(@Body() loginDetails: vendorLoginDto) {
-  //   return this.vendorService.login(loginDetails);
-  // }
+  @ApiUnauthorizedResponse({
+    description:
+      'Invalid Email or Password, Please check your login credentials',
+  })
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  Login(@Body() loginDetails: LoginDto) {
+    return this.vendorService.login(loginDetails);
+  }
 
   /** API Endpoint to Logout Vendor */
-  // @Get('vendor/logout')
-  // @UseGuards(JwtGuard)
-  // async Logout(@Req() req: Request) {
-  //   await this.vendorService.logout(req.user['id']);
-  //   return 'You have successfully logout of the system, see you soon!';
-  // }
+  @Get('logout')
+  @UseGuards(VendorGuard)
+  async Logout(@Req() req: Request) {
+    return this.vendorService.logout(req.user?.id);
+  }
 
   /** API Endpoint to get Refresh Tokens */
-  // @Get('vendor/refresh')
-  // @UseGuards(RefreshTokenGuard)
-  // refresh(@Req() req: Request) {
-  //   const user = req.user;
-  //   return this.vendorService.refreshToken(
-  //     user['refreshToken'],
-  //     user['payload'],
-  //   );
-  // }
+  @Get('refresh')
+  @UseGuards(RefreshTokenGuard)
+  refresh(@Req() req: Request) {
+    const vendor = req.user;
+    return this.vendorService.refreshToken(
+      vendor['refreshToken'],
+      vendor['payload'],
+    );
+  }
 }

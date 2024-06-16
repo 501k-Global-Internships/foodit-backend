@@ -8,7 +8,10 @@ import { JwtPayload } from 'src/shared/constants/typeDef.dto';
 import { Vendor } from '../../vendor/entities/vendor.entity';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class VendorJwtStrategy extends PassportStrategy(
+  Strategy,
+  'vendor_jwt_guard',
+) {
   constructor(
     @InjectRepository(Vendor) private vendorRepository: Repository<Vendor>,
     configService: ConfigService,

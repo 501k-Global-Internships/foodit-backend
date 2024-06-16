@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -209,7 +210,7 @@ Find User by credentials
     // Find User by email
     const user = await this.userRepository.findOneBy({ email });
     if (!user)
-      throw new BadRequestException('User does not exist!, Kindly signup');
+      throw new NotFoundException('User does not exist!, Kindly signup');
     // Validate password
     if (await bcrypt.compare(password, user.password)) {
       return user;

@@ -11,6 +11,7 @@ import { UserModule } from 'src/user/user.module';
 // import { HelperService } from 'src/shared/constants/helper.service';
 import { JwtHandler } from './jwt.service';
 import { HelperService } from 'src/shared/helper.service';
+import { VendorJwtStrategy } from './strategies/vendor_jwt_at.strategy';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { HelperService } from 'src/shared/helper.service';
   providers: [
     AuthService,
     JwtStrategy,
+    VendorJwtStrategy,
     RtStrategy,
     HelperService,
     JwtHandler,

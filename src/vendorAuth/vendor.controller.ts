@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpCode,
@@ -9,6 +10,7 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -24,12 +26,11 @@ import { Request } from 'express';
 import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
-// import { RefreshTokenGuard } from '../guards/jwt_rt.guard';
-// import { Request } from 'express';
-// import { JwtGuard } from '../guards/jwt_at.guard';
 
 @ApiTags('Auth')
 @Controller('auth/vendor')
+//Removing sensitive through serialization
+@UseInterceptors(ClassSerializerInterceptor)
 export class VendorController {
   logger: Logger;
   constructor(private readonly vendorService: VendorService) {
@@ -91,7 +92,8 @@ export class VendorController {
   }
 
   /** API Endpoint to get Refresh Tokens */
-  @Get('refresh')
+  @Get('refresh-token')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(RefreshTokenGuard)
   refresh(@Req() req: Request) {
     const vendor = req.user;

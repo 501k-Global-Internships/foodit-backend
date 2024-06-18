@@ -17,13 +17,13 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 import { Request } from 'express';
 import { JwtGuard } from './guards/jwt_at.guard';
 import { ForgotPasswordDto } from './dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword/resetPassword.dto';
 import { ForgotPasswordRO } from './dto/forgotPassword/adapter.dto';
 import { AuthService } from './auth.service';
+import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 
 @ApiTags('Auth')
 @Controller('auth')

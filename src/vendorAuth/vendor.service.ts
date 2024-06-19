@@ -16,7 +16,7 @@ import { HelperService } from 'src/shared/helper.service';
 import { EmailService } from 'src/email/email.service';
 import { JwtHandler } from 'src/userAuth/jwt.service';
 import { JwtPayload, StatusType, Tokens } from 'src/shared/constants';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { LoginDto } from 'src/userAuth/dto/login/login.dto';
 import * as bcrypt from 'bcrypt';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
@@ -76,7 +76,6 @@ Account Confirmation Method
       status: StatusType.ACTIVATED,
       confirmationCode: null,
     };
-
     try {
       await this.vendorRepository.update({ confirmationCode }, updateData);
     } catch (error) {

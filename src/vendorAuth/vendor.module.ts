@@ -13,4 +13,4 @@ import { HelperService } from 'src/shared/helper.service';
   providers: [VendorService, JwtHandler, HelperService],
   exports: [VendorService],
 })
-export class VendorModule {}
+export class VendorAuthModule {}

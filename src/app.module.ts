@@ -11,7 +11,8 @@ import { AppService } from './app.service';
 import { Vendor } from './vendorAuth/entities/vendor.entity';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpErrorFilter } from './shared/http-error-filter';
-import { VendorModule } from './vendorAuth/vendor.module';
+import { VendorAuthModule } from './vendorAuth/vendor.module';
+import { VendorModule } from './vendor/vendor.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { VendorModule } from './vendorAuth/vendor.module';
     AdminModule,
     EmailModule,
     VendorModule,
+    VendorAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],

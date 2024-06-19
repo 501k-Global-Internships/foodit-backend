@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -21,7 +22,7 @@ import { VendorSignupDto } from 'src/vendorAuth/dto/vendor-signup.dto';
 import { VendorService } from './vendor.service';
 import { ConfirmAccountDto } from './dto/confirmAccount.dto';
 import { LoginDto } from 'src/userAuth/dto/login/login.dto';
-import { VendorGuard } from 'src/userAuth/vendorGuards/vendor_jwt_at.guard';
+import { VendorAuthGuard } from 'src/userAuth/vendorGuards/vendor_jwt_at.guard';
 import { Request } from 'express';
 import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
@@ -44,7 +45,7 @@ export class VendorController {
     return this.vendorService.createVendor(signupDetails);
   }
 
-  @Get('account_activation')
+  @Get('account_activation/:confirmationCode')
   @HttpCode(HttpStatus.OK)
   confirmAccount(@Param() paramData: ConfirmAccountDto) {
     const { confirmationCode } = paramData;
@@ -64,7 +65,7 @@ export class VendorController {
 
   /** API Endpoint to Logout Vendor */
   @Get('logout')
-  @UseGuards(VendorGuard)
+  @UseGuards(VendorAuthGuard)
   async Logout(@Req() req: Request) {
     return this.vendorService.logout(req.user?.id);
   }

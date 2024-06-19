@@ -27,6 +27,7 @@ import { Request } from 'express';
 import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
+import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 @ApiTags('Auth')
 @Controller('auth/vendor')
@@ -68,6 +69,14 @@ export class VendorController {
   @UseGuards(VendorAuthGuard)
   async Logout(@Req() req: Request) {
     return this.vendorService.logout(req.user?.id);
+  }
+
+  @Patch()
+  @UseGuards(VendorAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  updateVendor(@Req() req: Request, @Body() updateDetails: UpdateVendorDto) {
+    const { id } = req.user;
+    return this.vendorService.updateVendor(id, updateDetails);
   }
 
   /**

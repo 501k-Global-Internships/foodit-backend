@@ -21,6 +21,7 @@ import { LoginDto } from 'src/userAuth/dto/login/login.dto';
 import * as bcrypt from 'bcrypt';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
+import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 @Injectable()
 export class VendorService {
@@ -118,6 +119,14 @@ Vendor Logout Method
     return 'You have successfully logout of the system, see you soon!';
   }
 
+  async updateVendor(id: number, updateDetails: UpdateVendorDto) {
+    try {
+      await this.vendorRepository.update({ id }, updateDetails);
+      return 'Profile updated successfully!';
+    } catch (error) {
+      throw new DatabaseExceptionFilter(error);
+    }
+  }
   /* 
 =======================================
 find Vendor By Credentials Method

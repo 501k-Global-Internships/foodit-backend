@@ -1,43 +1,44 @@
-import { Exclude } from 'class-transformer';
-import { UserRole } from 'src/utils/typeDef.dto';
 import * as bcrypt from 'bcrypt';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ApiHideProperty } from '@nestjs/swagger';
+import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BaseEntity } from 'src/shared/entities';
+import { UserLoginResponseDTO } from 'src/userAuth/dto/login/response.dto';
+import { UserType } from 'src/shared/constants';
 
 @Entity()
-export class User {
-  /** The User Id (Primary Key)
-   */
-  @PrimaryGeneratedColumn({ type: 'bigint' })
-  id: number;
-
-  @Column({ nullable: false })
+export class User extends BaseEntity {
+  @Column()
   name: string;
 
-  @Column({ unique: true })
-  email: string;
-
-  @ApiHideProperty()
-  @Column({ nullable: false })
-  @Exclude() //Exlcude password from response
-  password: string;
-
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
-  role: UserRole;
-
-  @ApiHideProperty()
   @Column({ nullable: true })
-  @Exclude() //Exlcude password from response
-  refreshToken: string;
+  phoneNumber: string;
+
+  @Column({ type: 'enum', enum: UserType, default: UserType.User })
+  userType: UserType;
 
   //Hashing User plain text password before saving using Entity Listener
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 8);
   }
 
-  //Enabling Serialization (Removing sensitive datas)
+  LoginResponseObject(): UserLoginResponseDTO {
+    const { id, email, name, createdAt, phoneNumber, updatedAt, userType } =
+      this;
+    return {
+      id,
+      email,
+      name,
+      phoneNumber,
+      userType,
+      createdAt,
+      updatedAt,
+    };
+  }
+
+  // Enabling Serialization (Removing sensitive datas)
   constructor(partial: Partial<User>) {
+    super();
     Object.assign(this, partial);
   }
 }

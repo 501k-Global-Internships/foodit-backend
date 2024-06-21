@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './userAuth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { EmailModule } from './email/email.module';
-// import { VendorModule } from './vendor/vendor.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Vendor } from './vendor/entities/vendor.entity';
+import { Vendor } from './vendorAuth/entities/vendor.entity';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpErrorFilter } from './shared/http-error-filter';
+import { VendorAuthModule } from './vendorAuth/vendor.module';
+import { VendorModule } from './vendor/vendor.module';
 
 @Module({
   imports: [
@@ -39,9 +42,10 @@ import { Vendor } from './vendor/entities/vendor.entity';
     AuthModule,
     AdminModule,
     EmailModule,
-    // VendorModule,
+    VendorModule,
+    VendorAuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],
 })
 export class AppModule {}

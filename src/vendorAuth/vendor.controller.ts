@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -15,6 +16,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -99,6 +101,18 @@ export class VendorController {
   @HttpCode(HttpStatus.OK)
   resetPassword(@Body() resetData: ResetPasswordDto): Promise<string> {
     return this.vendorService.resetPassword(resetData);
+  }
+
+  /**
+   * It finds and deactivate Vendor matching the given ID.
+   *  If it cannot find it, it returns an error
+   */
+  @Delete()
+  @UseGuards(VendorAuthGuard)
+  @ApiOperation({ description: 'API Endpoint for deactivating Vendor data' })
+  @HttpCode(HttpStatus.OK)
+  deactivateUser(@Req() req: Request) {
+    return this.vendorService.deactivateVendor(req.user['id']);
   }
 
   /** API Endpoint to get Refresh Tokens */

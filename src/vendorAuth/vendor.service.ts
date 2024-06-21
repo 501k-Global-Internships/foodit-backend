@@ -143,9 +143,14 @@ find Vendor By Credentials Method
         'No Account with this credentials!, Kindly signup',
       );
 
-    if (vendor && vendor.status === StatusType.PENDING)
+    if (vendor.status === StatusType.PENDING)
       throw new UnauthorizedException(
         'Account not activated, kindly check your mail for activation link',
+      );
+
+    if (vendor.status === StatusType.INACTIVE)
+      throw new UnauthorizedException(
+        'Account deactivated, kindly reach out to admin to activate your account',
       );
 
     // Validate password
@@ -225,6 +230,10 @@ Password Reset Method
     return 'Your Password has been reset successfully, Kindly login with your new password';
   }
 
+  async deactivateVendor(id: number) {
+    await this.vendorRepository.update({ id }, { status: StatusType.INACTIVE });
+    return 'Profile deactivated successfully!';
+  }
   /* 
 =======================================
 Refresh Token Method

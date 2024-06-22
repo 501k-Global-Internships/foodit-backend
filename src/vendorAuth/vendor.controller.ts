@@ -70,15 +70,14 @@ export class VendorController {
   @Get('logout')
   @UseGuards(VendorAuthGuard)
   async Logout(@Req() req: Request) {
-    return this.vendorService.logout(req.user?.id);
+    return this.vendorService.logout(req.user['id']);
   }
 
   @Patch()
   @UseGuards(VendorAuthGuard)
   @HttpCode(HttpStatus.OK)
   updateVendor(@Req() req: Request, @Body() updateDetails: UpdateVendorDto) {
-    const { id } = req.user;
-    return this.vendorService.updateVendor(id, updateDetails);
+    return this.vendorService.updateVendor(req.user['id'], updateDetails);
   }
 
   /**

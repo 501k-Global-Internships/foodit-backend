@@ -36,4 +36,5 @@ export abstract class BaseEntity {
 
   // @UpdateDateColumn({ precision: 0 })
   // updatedAt: Date;
+
 }

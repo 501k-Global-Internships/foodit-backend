@@ -31,9 +31,9 @@ export abstract class BaseEntity {
   @Exclude() //Exlcude resetToken from response
   resetPasswordToken: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ precision: 0 })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ precision: 0 })
   updatedAt: Date;
 }

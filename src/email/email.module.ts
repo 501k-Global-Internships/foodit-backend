@@ -15,9 +15,11 @@ import { ConfigService } from '@nestjs/config';
           service: 'gmail',
           // host: "smtp.gmail.com",
           port: 465,
-          //port: 587,
-          // secure: false,
+          // port: 587,
           secure: false,
+          // secure: true,
+          debug: true,
+          logger: true,
           auth: {
             // type: "OAuth2",
             user: config.get('USER_GMAIL'),

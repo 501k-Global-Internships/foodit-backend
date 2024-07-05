@@ -14,7 +14,7 @@ Send Welcome Email
 ========================================
 */
   async sendUserWelcomeEmail(user: User, token: string) {
-    const confirmationUrl = `exmaple.com/auth/confrim?token=${token}`;
+    const confirmationUrl = `https://foodit-cpig.onrender.com/auth/confrim?token=${token}`;
 
     await this.mailService.sendMail({
       to: user.email,

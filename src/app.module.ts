@@ -18,6 +18,7 @@ import { VendorModule } from './vendor/vendor.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // envFilePath: './env/.prod.env',
       envFilePath:
         process.env.NODE_ENV === 'production'
           ? './env/.prod.env'
@@ -35,7 +36,7 @@ import { VendorModule } from './vendor/vendor.module';
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
         entities: [User, Vendor],
-        // synchronize: true,
+        synchronize: true,
       }),
     }),
     UserModule,

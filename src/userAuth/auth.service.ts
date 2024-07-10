@@ -21,6 +21,7 @@ import { JwtHandler } from './jwt.service';
 import { UserRO } from './dto/login/adapter.dto';
 import { HelperService } from 'src/shared/helper.service';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
+import { UpdateLocationDto } from './dto/updateLocation.dto';
 
 @Injectable()
 export class AuthService {
@@ -116,7 +117,7 @@ Password Recovery Method
 ========================================
 */
 
-  forgotPassowrd = async (
+  forgotPassword = async (
     details: ForgotPasswordDto,
   ): Promise<ForgotPasswordRO> => {
     const { email } = details;
@@ -234,5 +235,22 @@ Update Refresh Token
     } catch (error) {
       throw new DatabaseExceptionFilter(error);
     }
+  }
+
+    /* 
+=======================================
+Update User Location
+========================================
+*/
+  async  updateLocation( id: number, updateLocationDto: UpdateLocationDto): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    console.log(user);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+      user.lat = updateLocationDto.lat;
+      user.lng = updateLocationDto.lng;
+      
+      return this.userRepository.save(user);
   }
 }

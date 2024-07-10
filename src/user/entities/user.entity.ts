@@ -23,7 +23,7 @@ export class User extends BaseEntity {
   }
 
   LoginResponseObject(): UserLoginResponseDTO {
-    const { id, email, name, createdAt, phoneNumber, updatedAt, userType } =
+    const { id, email, name, createdAt, phoneNumber, updatedAt, userType, lat, lng} =
       this;
     return {
       id,
@@ -33,6 +33,8 @@ export class User extends BaseEntity {
       userType,
       createdAt,
       updatedAt,
+      lat,
+      lng
     };
   }
 

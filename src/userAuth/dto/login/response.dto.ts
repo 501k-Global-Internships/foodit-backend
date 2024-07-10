@@ -53,4 +53,16 @@ export class UserLoginResponseDTO {
   //  * @example 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHRlc3RjbGllbnQuY29tIiwiaWF0IjoxNjU5MzcwMDY1LCJleHAiOjE2NTkzNzM2NjV9.NqC6lk3mRfRTzFQe2rBCDgdahZHZip4I4yqIyXNSFb8'
   //  */
   // refreshToken: string;
+
+  /**
+   * This is the latitude of the user
+   * @example '76.0005'
+   */  
+  lat: number;
+
+    /**
+   * This is the longitude of the user
+   * @example '43.0009'
+   */
+  lng: number;
 }

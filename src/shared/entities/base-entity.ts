@@ -35,4 +35,10 @@ export abstract class BaseEntity {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })
+  lat: number;
+
+  @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })
+  lng: number;
 }

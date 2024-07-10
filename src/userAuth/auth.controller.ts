@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Param,
   Req,
   UseGuards,
   UseInterceptors,
@@ -24,6 +25,8 @@ import { ResetPasswordDto } from './dto/resetPassword/resetPassword.dto';
 import { ForgotPasswordRO } from './dto/forgotPassword/adapter.dto';
 import { AuthService } from './auth.service';
 import { RefreshTokenGuard } from './guards/jwt_rt.guard';
+import { UpdateLocationDto } from './dto/updateLocation.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -63,6 +66,16 @@ export class AuthController {
     return 'You have successfully logout of the system, see you soon!';
   }
 
+  /**API Endpoint to Update User Location */
+  @Post('location/update')
+  @HttpCode(HttpStatus.OK)
+  async updateLocation(
+    @Param('id') id: number,
+    @Body() updateLocationDto: UpdateLocationDto
+  ): Promise<User> {
+    return this.authService.updateLocation(id, updateLocationDto);
+  }
+
   /**
    * This endpoint is  called when a user forgots his/her password
    * @param forgotPasswordData
@@ -72,7 +85,7 @@ export class AuthController {
   forgotPassword(
     @Body() forgotPasswordData: ForgotPasswordDto,
   ): Promise<ForgotPasswordRO> {
-    return this.authService.forgotPassowrd(forgotPasswordData);
+    return this.authService.forgotPassword(forgotPasswordData);
   }
 
   /**

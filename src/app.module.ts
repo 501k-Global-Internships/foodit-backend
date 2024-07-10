@@ -18,6 +18,7 @@ import { VendorModule } from './vendor/vendor.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // envFilePath: './env/.prod.env',
       envFilePath:
         process.env.NODE_ENV === 'production'
           ? './env/.prod.env'

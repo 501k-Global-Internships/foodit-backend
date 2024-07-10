@@ -1,6 +1,6 @@
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeUpdate, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export abstract class BaseEntity {
   /** The User Id (Primary Key)
@@ -29,11 +29,7 @@ export abstract class BaseEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
+  @Column({ type: 'datetime' })
   updatedAt: Date;
 
   @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })
@@ -41,4 +37,9 @@ export abstract class BaseEntity {
 
   @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })
   lng: number;
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updatedAt = new Date();
+  }
 }

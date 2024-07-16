@@ -29,7 +29,7 @@ export abstract class BaseEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'datetime', nullable: true })
   updatedAt: Date;
 
   @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })

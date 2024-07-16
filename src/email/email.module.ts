@@ -12,9 +12,9 @@ import { ConfigService } from '@nestjs/config';
       useFactory: async (config: ConfigService) => ({
         transport: {
           host: config.get('MAIL_HOST'),
-          service: 'gmail',
+          // service: 'gmail',
           // host: "smtp.gmail.com",
-          port: 465,
+          // port: 465,
           // port: 587,
           secure: false,
           // secure: true,

@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities';
 import { UserLoginResponseDTO } from 'src/userAuth/dto/login/response.dto';

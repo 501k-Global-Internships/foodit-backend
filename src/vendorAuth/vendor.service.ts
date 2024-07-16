@@ -18,7 +18,7 @@ import { JwtHandler } from 'src/userAuth/jwt.service';
 import { JwtPayload, StatusType, Tokens } from 'src/shared/constants';
 import * as crypto from 'crypto';
 import { LoginDto } from 'src/userAuth/dto/login/login.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';

@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { BaseEntity } from '../../shared/entities/base-entity';
 // import { VendorLoginResponseDTO } from '../dto/login-response.dto';

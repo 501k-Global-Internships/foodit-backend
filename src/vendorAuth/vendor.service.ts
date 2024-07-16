@@ -22,6 +22,7 @@ import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class VendorService {
@@ -29,6 +30,7 @@ export class VendorService {
   constructor(
     @InjectRepository(Vendor)
     private readonly vendorRepository: Repository<Vendor>,
+    private readonly userRepository: Repository<User>,
     private jwtService: JwtHandler,
     private helperService: HelperService,
     private emailService: EmailService,
@@ -267,5 +269,34 @@ Update Refresh Token Method
     } catch (error) {
       throw new DatabaseExceptionFilter(error);
     }
+  }
+
+// Haversine formula to calculate distance between two coordinates
+   private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLng = (lng2 - lng1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in km
+    return distance;
+  }
+
+  async findNearbyVendors(id: number, radius: number): Promise<Vendor[]> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const vendors = await this.vendorRepository.find();
+    return vendors.filter((vendor) => {
+      const distance = this.calculateDistance(user.lat, user.lng, vendor.lat, vendor.lng);
+      return distance <= radius;
+    });
   }
 }

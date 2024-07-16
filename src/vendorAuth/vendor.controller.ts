@@ -10,6 +10,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -24,6 +25,7 @@ import { VendorSignupDto } from 'src/vendorAuth/dto/vendor-signup.dto';
 import { VendorService } from './vendor.service';
 import { ConfirmAccountDto } from './dto/confirmAccount.dto';
 import { LoginDto } from 'src/userAuth/dto/login/login.dto';
+import { Vendor } from './entities/vendor.entity';
 import { VendorAuthGuard } from 'src/userAuth/vendorGuards/vendor_jwt_at.guard';
 import { Request } from 'express';
 import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
@@ -78,6 +80,13 @@ export class VendorController {
   @HttpCode(HttpStatus.OK)
   updateVendor(@Req() req: Request, @Body() updateDetails: UpdateVendorDto) {
     return this.vendorService.updateVendor(req.user['id'], updateDetails);
+  }
+
+  @Get('nearby/:id')
+  @UseGuards(VendorAuthGuard)
+  @ApiOperation({ description: 'Get vendors nearby based on user location' })
+  async getNearbyVendors(@Param('id') id: number, @Query('radius') radius: number): Promise<Vendor[]> {
+    return this.vendorService.findNearbyVendors(id, radius);
   }
 
   /**

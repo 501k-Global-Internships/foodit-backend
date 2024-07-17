@@ -25,7 +25,7 @@ import { ForgotPasswordRO } from './dto/forgotPassword/adapter.dto';
 import { AuthService } from './auth.service';
 import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 
-@ApiTags('Auth')
+@ApiTags('UserAuth')
 @Controller('auth')
 //Removing sensitive through serialization
 @UseInterceptors(ClassSerializerInterceptor)

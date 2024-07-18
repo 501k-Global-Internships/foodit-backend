@@ -30,7 +30,8 @@ export class JwtHandler {
           expiresIn: this.RT_EXPIRATION,
         }),
       ]);
-
+      console.log(`Generated Access Token: ${accessToken}`);
+      console.log(`Generated Refresh Token: ${refreshToken}`);
       return { accessToken, refreshToken };
     } catch (error) {
       this.logger.error(JSON.stringify(error));

@@ -23,6 +23,7 @@ import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPasswor
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { User } from 'src/user/entities/user.entity';
+import { UpdateLocationDto } from './dto/updateLocation.dto';
 
 @Injectable()
 export class VendorService {
@@ -30,6 +31,7 @@ export class VendorService {
   constructor(
     @InjectRepository(Vendor)
     private readonly vendorRepository: Repository<Vendor>,
+    @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private jwtService: JwtHandler,
     private helperService: HelperService,
@@ -102,9 +104,11 @@ Vendor Login Method
     const vendor = await this.findVendorByCredentials(loginDetails);
     // Generate JWT token payload
     const payload = { sub: vendor.id, email: vendor.email };
+    console.log( payload )
     // Generate Tokens
     const { accessToken, refreshToken } =
       await this.jwtService.generateTokens(payload);
+      console.log( accessToken, refreshToken )
     await this.updateRefreshToken(payload.sub, refreshToken);
 
     return { vendor, accessToken, refreshToken };
@@ -271,17 +275,38 @@ Update Refresh Token Method
     }
   }
 
-// Haversine formula to calculate distance between two coordinates
-   private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+ /*
+=======================================
+Update Vendor Location
+========================================
+*/
+  async  updateLocation( id: number, updateLocationDto: UpdateLocationDto): Promise<Vendor> {
+    const vendor = await this.vendorRepository.findOneBy({ id });
+    console.log(vendor);
+    if (!vendor) {
+      throw new NotFoundException('Vendor not found');
+    }
+      vendor.lat = updateLocationDto.lat;
+      vendor.lng = updateLocationDto.lng;
+        
+      return this.vendorRepository.save(vendor);
+  }
+
+ /*
+=====================================================================
+Haversine formula to calculate distance between two coordinates
+=====================================================================
+*/
+  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371; // Radius of the Earth in km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLng = (lng2 - lng1) * (Math.PI / 180);
     const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
+     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+     Math.cos(lat1 * (Math.PI / 180)) *
+     Math.cos(lat2 * (Math.PI / 180)) *
+     Math.sin(dLng / 2) *
+     Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; // Distance in km
     return distance;

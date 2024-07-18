@@ -32,6 +32,7 @@ import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { UpdateLocationDto } from './dto/updateLocation.dto';
 
 @ApiTags('Auth')
 @Controller('auth/vendor')
@@ -80,6 +81,16 @@ export class VendorController {
   @HttpCode(HttpStatus.OK)
   updateVendor(@Req() req: Request, @Body() updateDetails: UpdateVendorDto) {
     return this.vendorService.updateVendor(req.user['id'], updateDetails);
+  }
+  
+  /**API Endpoint to Update User Location */
+  @Post('location/update')
+  @HttpCode(HttpStatus.OK)
+  async updateLocation(
+    @Param('id') id: number,
+    @Body() updateLocationDto: UpdateLocationDto
+  ): Promise<Vendor> {
+    return this.vendorService.updateLocation(id, updateLocationDto);
   }
 
   @Get('nearby/:id')

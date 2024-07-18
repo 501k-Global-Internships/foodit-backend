@@ -34,7 +34,7 @@ import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.d
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
 
-@ApiTags('Auth')
+@ApiTags('VendorAuth')
 @Controller('auth/vendor')
 //Removing sensitive through serialization
 @UseInterceptors(ClassSerializerInterceptor)

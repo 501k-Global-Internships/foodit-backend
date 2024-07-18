@@ -28,7 +28,7 @@ import { RefreshTokenGuard } from './guards/jwt_rt.guard';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
 import { User } from 'src/user/entities/user.entity';
 
-@ApiTags('Auth')
+@ApiTags('UserAuth')
 @Controller('auth')
 //Removing sensitive through serialization
 @UseInterceptors(ClassSerializerInterceptor)

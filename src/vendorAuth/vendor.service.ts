@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
-import { VendorSignupDto } from 'src/vendorAuth/dto/vendor-signup.dto';
-import { Vendor } from 'src/vendorAuth/entities/vendor.entity';
+import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Repository } from 'typeorm';
 import { HelperService } from 'src/shared/helper.service';
 import { EmailService } from 'src/email/email.service';
@@ -21,7 +21,7 @@ import { LoginDto } from 'src/userAuth/dto/login/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
-import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { UpdateVendorDto } from '../vendor/dto/update-vendor.dto';
 
 @Injectable()
 export class VendorService {

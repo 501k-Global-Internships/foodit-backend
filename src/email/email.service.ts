@@ -2,7 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { PasswordRecoveryData } from 'src/shared/constants';
 import { User } from 'src/user/entities/user.entity';
-import { Vendor } from 'src/vendorAuth/entities/vendor.entity';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @Injectable()
 export class EmailService {
@@ -29,7 +29,7 @@ Send Welcome Email
   }
 
   async sendAccountActivationCode(vendor: Vendor, confirmationCode: string) {
-    const confirmationUrl = `https://foodit-cpig.onrender.com/auth/vendor/account_activation?token=${confirmationCode}`;
+    const confirmationUrl = `https://foodit-cpig.onrender.com/auth/vendor/account_activation/${confirmationCode}`;
 
     await this.mailService.sendMail({
       to: vendor.email,
@@ -56,7 +56,7 @@ Send Welcome Email
   }
 
   async validationMail(vendor: Vendor, token: string) {
-    const confirmationUrl = `exmaple.com/auth/confrim?token=${token}`;
+    const confirmationUrl = `exmaple.com/auth/confirm?token=${token}`;
 
     await this.mailService.sendMail({
       to: vendor.email,

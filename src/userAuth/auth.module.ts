@@ -12,7 +12,7 @@ import { UserModule } from 'src/user/user.module';
 import { JwtHandler } from './jwt.service';
 import { HelperService } from 'src/shared/helper.service';
 import { VendorJwtStrategy } from './strategies/vendor_jwt_at.strategy';
-import { Vendor } from 'src/vendorAuth/entities/vendor.entity';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @Module({
   imports: [

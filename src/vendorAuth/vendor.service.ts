@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
-import { VendorSignupDto } from 'src/vendorAuth/dto/vendor-signup.dto';
-import { Vendor } from 'src/vendorAuth/entities/vendor.entity';
+import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Repository } from 'typeorm';
 import { HelperService } from 'src/shared/helper.service';
 import { EmailService } from 'src/email/email.service';
@@ -21,9 +21,9 @@ import { LoginDto } from 'src/userAuth/dto/login/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
-import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { UpdateVendorDto } from 'src/vendor/dto/update-vendor.dto';
 import { User } from 'src/user/entities/user.entity';
-import { UpdateLocationDto } from './dto/updateLocation.dto';
+import { UpdateLocationDto } from 'src/vendor/dto/updateLocation.dto';
 
 @Injectable()
 export class VendorService {
@@ -112,7 +112,11 @@ Vendor Login Method
     await this.updateRefreshToken(payload.sub, refreshToken);
 
     return { vendor, accessToken, refreshToken };
+     } catch (error) {
+    console.error('Error during login:', error);
+    throw new InternalServerErrorException('Login failed');
   }
+
 
   /* 
 =======================================
@@ -318,10 +322,21 @@ Haversine formula to calculate distance between two coordinates
       throw new NotFoundException('User not found');
     }
 
+    this.logger.log(`User Location: Lat ${user.lat}, Lng ${user.lng}`);
+
     const vendors = await this.vendorRepository.find();
-    return vendors.filter((vendor) => {
+    this.logger.log(`Found ${vendors.length} vendors`);
+
+    const nearbyVendors = vendors.filter((vendor) => {
       const distance = this.calculateDistance(user.lat, user.lng, vendor.lat, vendor.lng);
+      this.logger.log(
+        `Vendor ID: ${vendor.id}, Distance: ${distance}, Within Radius: ${distance <= radius}`
+      );
       return distance <= radius;
     });
+
+    this.logger.log(`Nearby Vendors Count: ${nearbyVendors.length}`);
+
+    return nearbyVendors;
   }
 }

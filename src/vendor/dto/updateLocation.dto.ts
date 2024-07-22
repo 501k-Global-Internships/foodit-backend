@@ -1,4 +1,3 @@
-// src/userAuth/dto/Location.dto.ts
 import { IsNumber } from "class-validator";
 
 export class UpdateLocationDto {

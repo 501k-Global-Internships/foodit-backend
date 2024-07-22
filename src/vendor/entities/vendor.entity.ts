@@ -1,10 +1,12 @@
 import * as bcrypt from 'bcryptjs';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../shared/entities/base-entity';
 // import { VendorLoginResponseDTO } from '../dto/login-response.dto';
 import { StatusType, UserType } from 'src/shared/constants';
 import { Exclude } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
+import { Dish } from 'src/dishes/entities/dish.entity';
+import { Menu } from 'src/menu/entities/menu.entity';
 
 @Entity()
 export class Vendor extends BaseEntity {
@@ -32,35 +34,18 @@ export class Vendor extends BaseEntity {
   })
   status: StatusType;
 
+  @OneToMany(() => Dish, (dish) => dish.vendor)
+  dishes: Dish[];
+
+  @OneToMany(() => Menu, (menu) => menu.vendor)
+  menus: Menu[];
+
   //Hashing Vendor plain text password before saving using Entity Listener
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 8);
   }
-
-  // LoginResponseObject(): VendorLoginResponseDTO {
-  //   const {
-  //     id,
-  //     email,
-  //     businessName,
-  //     businessAddress,
-  //     createdAt,
-  //     phoneNumber,
-  //     updatedAt,
-  //     userType,
-  //   } = this;
-  //   return {
-  //     id,
-  //     email,
-  //     businessName,
-  //     phoneNumber,
-  //     businessAddress,
-  //     userType,
-  //     createdAt,
-  //     updatedAt,
-  //   };
-  // }
 
   //Enabling Serialization (Removing sensitive datas)
   constructor(partial: Partial<Vendor>) {

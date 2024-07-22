@@ -67,7 +67,7 @@ export class AuthController {
   }
 
   /**API Endpoint to Update User Location */
-  @Post('location/update')
+  @Post('location/update/:id')
   @HttpCode(HttpStatus.OK)
   async updateLocation(
     @Param('id') id: number,

@@ -10,6 +10,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -24,12 +25,14 @@ import { VendorSignupDto } from 'src/vendor/dto/vendor-signup.dto';
 import { VendorService } from './vendor.service';
 import { ConfirmAccountDto } from '../vendor/dto/confirmAccount.dto';
 import { LoginDto } from 'src/userAuth/dto/login/login.dto';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { VendorAuthGuard } from 'src/userAuth/vendorGuards/vendor_jwt_at.guard';
 import { Request } from 'express';
 import { RefreshTokenGuard } from 'src/userAuth/guards/jwt_rt.guard';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
 import { UpdateVendorDto } from '../vendor/dto/update-vendor.dto';
+import { UpdateLocationDto } from 'src/vendor/dto/updateLocation.dto';
 
 @ApiTags('VendorAuth')
 @Controller('auth/vendor')
@@ -78,6 +81,26 @@ export class VendorController {
   @HttpCode(HttpStatus.OK)
   updateVendor(@Req() req: Request, @Body() updateDetails: UpdateVendorDto) {
     return this.vendorService.updateVendor(req.user['id'], updateDetails);
+  }
+  
+  /**API Endpoint to Update User Location */
+  @Post('location/update/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateLocation(
+    @Param('id') id: number,
+    @Body() updateLocationDto: UpdateLocationDto
+  ): Promise<Vendor> {
+    return this.vendorService.updateLocation(id, updateLocationDto);
+  }
+
+  @Get('nearby/:id')
+  @ApiOperation({ description: 'Get vendors nearby based on user location' })
+  async getNearbyVendors(
+    @Param('id') id: number,
+    @Query('radius') radius: number = 10 // default radius to 10km if not provided
+  ): Promise<Vendor[]> {
+    this.logger.log(`Fetching nearby vendors for user ID: ${id} within radius: ${radius}`);
+    return this.vendorService.findNearbyVendors(id, radius);
   }
 
   /**

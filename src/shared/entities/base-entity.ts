@@ -32,6 +32,12 @@ export abstract class BaseEntity {
   @Column({ type: 'datetime', nullable: true })
   updatedAt: Date;
 
+  @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })
+  lat: number;
+
+  @Column({ nullable: true, default: 0, type: 'decimal', precision: 10, scale: 6 })
+  lng: number;
+
   @BeforeUpdate()
   updateTimestamp() {
     this.updatedAt = new Date();

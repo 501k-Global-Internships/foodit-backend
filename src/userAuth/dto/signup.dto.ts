@@ -3,7 +3,10 @@ import { IsEmail, IsStrongPassword, MinLength } from 'class-validator';
 export class CreateUserDto {
   /** @example 'Ismail Tijani' */
   @MinLength(3)
-  name: string;
+  firstname: string;
+
+  @MinLength(3)
+  lastname: string; 
 
   /** @example example@gmail.com */
   @IsEmail()

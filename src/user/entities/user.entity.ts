@@ -7,7 +7,10 @@ import { UserType } from 'src/shared/constants';
 @Entity()
 export class User extends BaseEntity {
   @Column()
-  name: string;
+  firstname: string;
+
+  @Column()
+  lastname: string; 
 
   @Column({ nullable: true })
   phoneNumber: string;
@@ -23,12 +26,13 @@ export class User extends BaseEntity {
   }
 
   LoginResponseObject(): UserLoginResponseDTO {
-    const { id, email, name, createdAt, phoneNumber, updatedAt, userType, lat, lng} =
+    const { id, email, firstname, lastname, createdAt, phoneNumber, updatedAt, userType, lat, lng} =
       this;
     return {
       id,
       email,
-      name,
+      firstname,
+      lastname,
       phoneNumber,
       userType,
       createdAt,

@@ -17,16 +17,18 @@ import { DishModule } from './dishes/dish.module';
 import { Dish } from './dishes/entities/dish.entity';
 import { MenuModule } from './menu/menu.module';
 import { Menu } from './menu/entities/menu.entity';
+import { OrderModule } from './order/order.module';
+import { CartModule } from './cart/cart.module';
+import { Order } from './order/entities/order.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: './env/.prod.env',
-      envFilePath:
-        process.env.NODE_ENV === 'production'
-          ? './env/.prod.env'
-          : './env/.dev.env',
+      // envFilePath:
+      //   process.env.NODE_ENV === 'production'
+      //     ? './env/.prod.env'
+      //     : './env/.dev.env',
     }),
 
     TypeOrmModule.forRootAsync({
@@ -39,7 +41,7 @@ import { Menu } from './menu/entities/menu.entity';
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
-        entities: [User, Vendor, Dish, Menu],
+        entities: [User, Vendor, Dish, Menu, Order],
         synchronize: true,
       }),
     }),
@@ -51,6 +53,8 @@ import { Menu } from './menu/entities/menu.entity';
     VendorAuthModule,
     DishModule,
     MenuModule,
+    OrderModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: HttpErrorFilter }],

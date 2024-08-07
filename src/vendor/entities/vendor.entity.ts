@@ -7,6 +7,7 @@ import { Exclude } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Dish } from 'src/dishes/entities/dish.entity';
 import { Menu } from 'src/menu/entities/menu.entity';
+import { Order } from 'src/order/entities/order.entity';
 
 @Entity()
 export class Vendor extends BaseEntity {
@@ -39,6 +40,9 @@ export class Vendor extends BaseEntity {
 
   @OneToMany(() => Menu, (menu) => menu.vendor)
   menus: Menu[];
+
+  @OneToMany(() => Order, (order) => order.vendor)
+  orders: Order[];
 
   //Hashing Vendor plain text password before saving using Entity Listener
   @BeforeInsert()

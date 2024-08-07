@@ -18,5 +18,15 @@ export enum DishCategory {
   Dessert = 'Dessert',
   Soup = 'Soup',
   Snacks = 'Snacks',
-  AfricanDishes = 'African Dishes',
+  African_Dishes = 'African Dishes',
+}
+
+export enum OrderStatus {
+  PLACED = 'placed',
+  CONFIRMED = 'confirmed',
+  PREPARING = 'preparing',
+  READY_FOR_PICKUP = 'ready for pickup',
+  IN_TRANSIT = 'in_transit',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
 }

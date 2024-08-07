@@ -14,7 +14,7 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 import { VendorAuthGuard } from 'src/userAuth/vendorGuards/vendor_jwt_at.guard';
 import { ApiTags } from '@nestjs/swagger';
 
-ApiTags('Menus');
+ApiTags('Menu');
 @Controller('vendor/menu')
 @UseGuards(VendorAuthGuard)
 export class MenuController {

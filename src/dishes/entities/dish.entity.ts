@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { DishResponseDto } from '../dto/dish-response.dto';
 import { Menu } from 'src/menu/entities/menu.entity';
+import { Order } from 'src/order/entities/order.entity';
 
 @Entity()
 export class Dish {
@@ -24,7 +25,7 @@ export class Dish {
   @Column({
     type: 'enum',
     enum: DishCategory,
-    default: DishCategory.AfricanDishes,
+    default: DishCategory.African_Dishes,
   })
   category: DishCategory;
 
@@ -42,6 +43,11 @@ export class Dish {
 
   @Column({ type: 'datetime', nullable: true })
   updatedAt: Date;
+
+  // @ManyToOne(() => Order, (order) => order.dishes)
+  // order: Order;
+  @ManyToMany(() => Order, (order) => order.dishes)
+  orders: Order[];
 
   @ManyToOne(() => Vendor, (vendor) => vendor.dishes)
   vendor: Vendor;

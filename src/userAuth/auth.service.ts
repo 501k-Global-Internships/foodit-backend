@@ -139,7 +139,7 @@ Password Recovery Method
 
     this.emailService.sendPasswordRecoveryEmail({
       email,
-      name: user.name,
+      name: user.firstName,
       resetToken,
     });
     return new ForgotPasswordRO({

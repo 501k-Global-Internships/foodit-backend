@@ -14,10 +14,10 @@ import { ConfigService } from '@nestjs/config';
           host: config.get('MAIL_HOST'),
           // service: 'gmail',
           // host: "smtp.gmail.com",
-          // port: 465,
+          port: 465,
           // port: 587,
-          secure: false,
-          // secure: true,
+          // secure: false,
+          secure: true,
           debug: true,
           logger: true,
           auth: {

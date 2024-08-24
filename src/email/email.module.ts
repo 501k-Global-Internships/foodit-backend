@@ -30,7 +30,7 @@ import { ConfigService } from '@nestjs/config';
           },
         },
         defaults: {
-          from: `"FoodIt" <${config.get('USER_GMAIL')}>`,
+          from: config.get<string>('USER_GMAIL'),
         },
         template: {
           dir: join(__dirname, 'templates'),

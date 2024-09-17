@@ -22,7 +22,7 @@ Send Welcome Email
       subject: 'Welcome to FoodIt! Confirm your Email',
       template: './welcome', // `.ejs` extension is appended automatically
       context: {
-        name: user.name,
+        name: user.firstname,
         confirmationUrl,
       },
     });

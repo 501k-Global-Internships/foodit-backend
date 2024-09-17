@@ -21,7 +21,9 @@ import { LoginDto } from 'src/userAuth/dto/login/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { ForgotPasswordDto } from 'src/userAuth/dto/forgotPassword/forgetPassword.dto';
 import { ResetPasswordDto } from 'src/userAuth/dto/resetPassword/resetPassword.dto';
-import { UpdateVendorDto } from '../vendor/dto/update-vendor.dto';
+import { UpdateVendorDto } from 'src/vendor/dto/update-vendor.dto';
+import { User } from 'src/user/entities/user.entity';
+import { UpdateLocationDto } from 'src/vendor/dto/updateLocation.dto';
 
 @Injectable()
 export class VendorService {
@@ -29,6 +31,8 @@ export class VendorService {
   constructor(
     @InjectRepository(Vendor)
     private readonly vendorRepository: Repository<Vendor>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private jwtService: JwtHandler,
     private helperService: HelperService,
     private emailService: EmailService,
@@ -100,13 +104,19 @@ Vendor Login Method
     const vendor = await this.findVendorByCredentials(loginDetails);
     // Generate JWT token payload
     const payload = { sub: vendor.id, email: vendor.email };
+    console.log( payload )
     // Generate Tokens
     const { accessToken, refreshToken } =
       await this.jwtService.generateTokens(payload);
+      console.log( accessToken, refreshToken )
     await this.updateRefreshToken(payload.sub, refreshToken);
 
     return { vendor, accessToken, refreshToken };
+     } catch (error) {
+    console.error('Error during login:', error);
+    throw new InternalServerErrorException('Login failed');
   }
+
 
   /* 
 =======================================
@@ -267,5 +277,66 @@ Update Refresh Token Method
     } catch (error) {
       throw new DatabaseExceptionFilter(error);
     }
+  }
+
+ /*
+=======================================
+Update Vendor Location
+========================================
+*/
+  async  updateLocation( id: number, updateLocationDto: UpdateLocationDto): Promise<Vendor> {
+    const vendor = await this.vendorRepository.findOneBy({ id });
+    console.log(vendor);
+    if (!vendor) {
+      throw new NotFoundException('Vendor not found');
+    }
+      vendor.lat = updateLocationDto.lat;
+      vendor.lng = updateLocationDto.lng;
+        
+      return this.vendorRepository.save(vendor);
+  }
+
+ /*
+=====================================================================
+Haversine formula to calculate distance between two coordinates
+=====================================================================
+*/
+  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLng = (lng2 - lng1) * (Math.PI / 180);
+    const a =
+     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+     Math.cos(lat1 * (Math.PI / 180)) *
+     Math.cos(lat2 * (Math.PI / 180)) *
+     Math.sin(dLng / 2) *
+     Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in km
+    return distance;
+  }
+
+  async findNearbyVendors(id: number, radius: number): Promise<Vendor[]> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    this.logger.log(`User Location: Lat ${user.lat}, Lng ${user.lng}`);
+
+    const vendors = await this.vendorRepository.find();
+    this.logger.log(`Found ${vendors.length} vendors`);
+
+    const nearbyVendors = vendors.filter((vendor) => {
+      const distance = this.calculateDistance(user.lat, user.lng, vendor.lat, vendor.lng);
+      this.logger.log(
+        `Vendor ID: ${vendor.id}, Distance: ${distance}, Within Radius: ${distance <= radius}`
+      );
+      return distance <= radius;
+    });
+
+    this.logger.log(`Nearby Vendors Count: ${nearbyVendors.length}`);
+
+    return nearbyVendors;
   }
 }

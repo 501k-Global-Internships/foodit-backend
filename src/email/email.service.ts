@@ -26,7 +26,11 @@ Send Welcome Email
       subject: 'Welcome to FoodIt! Confirm your Email',
       template: './welcome', // `.ejs` extension is appended automatically
       context: {
+<<<<<<< HEAD
+        name: user.firstname,
+=======
         name: user.firstName,
+>>>>>>> 238db1ea23fd6a5ac1bcca69676062243c81f99b
         confirmationUrl,
       },
     });

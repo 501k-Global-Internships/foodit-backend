@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload, Tokens } from 'src/shared/constants';
 import { JwtService } from '@nestjs/jwt';
@@ -30,10 +30,12 @@ export class JwtHandler {
           expiresIn: this.RT_EXPIRATION,
         }),
       ]);
-
+      console.log(`Generated Access Token: ${accessToken}`);
+      console.log(`Generated Refresh Token: ${refreshToken}`);
       return { accessToken, refreshToken };
     } catch (error) {
       this.logger.error(JSON.stringify(error));
+      throw new InternalServerErrorException('Failed to generate tokens');
     }
   }
 

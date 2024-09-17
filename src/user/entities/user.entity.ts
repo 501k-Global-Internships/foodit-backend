@@ -39,6 +39,8 @@ export class User extends BaseEntity {
       phoneNumber,
       updatedAt,
       userType,
+      lat,
+      lng
     } = this;
     return {
       id,
@@ -49,6 +51,8 @@ export class User extends BaseEntity {
       userType,
       createdAt,
       updatedAt,
+      lat,
+      lng
     };
   }
 

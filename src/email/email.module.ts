@@ -14,10 +14,10 @@ import { ConfigService } from '@nestjs/config';
           host: config.get('MAIL_HOST'),
           // service: 'gmail',
           // host: "smtp.gmail.com",
-          // port: 465,
+          port: 465,
           // port: 587,
-          secure: false,
-          // secure: true,
+          // secure: false,
+          secure: true,
           debug: true,
           logger: true,
           auth: {
@@ -30,7 +30,7 @@ import { ConfigService } from '@nestjs/config';
           },
         },
         defaults: {
-          from: `"FoodIt" <${config.get('USER_GMAIL')}>`,
+          from: config.get<string>('USER_GMAIL'),
         },
         template: {
           dir: join(__dirname, 'templates'),

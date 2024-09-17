@@ -14,16 +14,16 @@ export class UserLoginResponseDTO {
   email: string;
 
   /**
-   * This is the Name of the user
-   * @example 'Ismail'
+   * This is the First Name of the user
+   * @example Ismail
    */
-  firstname: string;
+  firstName: string;
 
   /**
-   * This is the last Name of the user
-   * @example 'Tijani'
+   * This is the Last Name of the user
+   * @example Adebare
    */
-  lastname: string;
+  lastName: string;
 
   /**
    * This is User Phone Number

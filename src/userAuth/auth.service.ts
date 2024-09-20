@@ -21,6 +21,7 @@ import { JwtHandler } from './jwt.service';
 import { UserRO } from './dto/login/adapter.dto';
 import { HelperService } from 'src/shared/helper.service';
 import { DatabaseExceptionFilter } from 'src/shared/database-error-filter';
+import { MailService } from 'src/email/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +34,7 @@ export class AuthService {
     // Inject EmailService
     private readonly emailService: EmailService,
     private readonly helperService: HelperService,
+    private readonly mailService: MailService,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -60,7 +62,11 @@ User Registration Method
     await this.updateRefreshToken(payload.sub, refreshToken);
 
     // Send Welcome Email
-    await this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
+    await this.mailService.sendWelcomeEmail(
+      savedUser.email,
+      savedUser.firstName,
+    );
+    // await this.emailService.sendUserWelcomeEmail(savedUser, '12345'); // Create a Dto and generate token
 
     const response = {
       ...savedUser.LoginResponseObject(),
